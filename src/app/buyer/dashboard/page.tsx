@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ClipboardList, MessageSquare, ShoppingBasket, Truck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives";
-import { PageHeader, StatCard } from "@/components/layout/page";
+import { PageHeader, StatCard, HeroCard } from "@/components/layout/page";
 import { OrderList } from "@/components/orders/order-list";
 import { ListingCard } from "@/components/marketplace/listing-card";
 import { requirePageRole } from "@/lib/auth/session";
@@ -45,6 +45,7 @@ export default async function BuyerDashboard() {
           </Button>
         }
       />
+      <HeroCard className="mb-4" eyebrow={profile?.businessName ?? "AgriFlow buyer"} label="Completed purchases" value={formatZMW(spent._sum.total ?? 0)} meta={[["Active orders", String(active.length)], ["Deliveries in progress", String(deliveries)]]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Active orders" value={active.length} icon={ClipboardList} href="/buyer/orders" />
         <StatCard label="Deliveries in progress" value={deliveries} icon={Truck} tone="sky" href="/buyer/deliveries" />

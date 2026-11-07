@@ -105,11 +105,11 @@ export function Chat({
   };
 
   return (
-    <div className="flex h-[calc(100dvh-13rem)] min-h-[480px] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[var(--shadow-card)] lg:h-[calc(100dvh-11rem)]">
+    <div className="flex h-[calc(100dvh-13rem)] min-h-[480px] flex-col overflow-hidden glass rounded-[1.75rem] shadow-[var(--shadow-card)] lg:h-[calc(100dvh-11rem)]">
       <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-6" aria-live="polite">
         {messages.length === 0 && (
           <div className="mx-auto max-w-xl py-6 text-center">
-            <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-forest-800 text-white">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-ink text-white">
               <Bot className="size-6" />
             </div>
             <p className="mt-4 text-lg font-semibold">{assistantName}</p>
@@ -128,7 +128,7 @@ export function Chat({
         ))}
         {pending && (
           <div className="flex items-center gap-3 text-sm text-navy-500">
-            <span className="flex size-8 items-center justify-center rounded-full bg-forest-800 text-white">
+            <span className="flex size-8 items-center justify-center rounded-full bg-ink text-white">
               <Loader2 className="size-4 animate-spin" />
             </span>
             Thinking with your farm data…
@@ -173,9 +173,9 @@ function MessageBubble({ msg, allowTasks, farms }: { msg: ChatMsg; allowTasks?: 
   const isUser = msg.role === "USER";
   return (
     <div className={cn("flex gap-3", isUser && "flex-row-reverse")}>
-      <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full", isUser ? "bg-navy-200 text-navy-700" : "bg-forest-800 text-white")}>{isUser ? <User className="size-4" /> : <Bot className="size-4" />}</span>
+      <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full", isUser ? "bg-navy-200 text-navy-700" : "bg-ink text-white shadow-sm")}>{isUser ? <User className="size-4" /> : <Bot className="size-4" />}</span>
       <div className={cn("max-w-[88%] space-y-2", isUser && "items-end")}>
-        <div className={cn("rounded-2xl px-4 py-3", isUser ? "rounded-tr-sm bg-forest-800 text-white" : "rounded-tl-sm bg-navy-50")}>
+        <div className={cn("rounded-2xl px-4 py-3", isUser ? "rounded-tr-md bg-ink text-white" : "rounded-tl-md bg-white shadow-sm ring-1 ring-black/[0.03]")}>
           {isUser ? <p className="whitespace-pre-wrap text-[0.95rem]">{msg.content}</p> : <Markdown text={msg.content} />}
         </div>
         {!isUser && msg.meta && (

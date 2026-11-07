@@ -38,7 +38,7 @@ export default async function LogisticsPage() {
         <Section title="Transporters on AgriFlow" muted>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {transporters.map((t) => (
-              <div key={t.id} className="rounded-2xl border border-border bg-white p-5">
+              <div key={t.id} className="glass rounded-[1.75rem] p-5">
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold">{t.transporterProfile!.businessName}</p>
                   {t.isDemo && <Badge tone="amber">Demo</Badge>}

@@ -31,22 +31,22 @@ function isActive(pathname: string, href: string) {
 
 export function AppShell({ role, name, email, unreadNotifications, unreadMessages, demoMode, children }: ShellProps) {
   const pathname = usePathname();
-  // Menu closes automatically on navigation: it is only open for the path it was opened on
+  // Drawer closes automatically on navigation: it is only open for the path it was opened on
   const [openOn, setOpenOn] = React.useState<string | null>(null);
   const open = openOn === pathname;
-  const setOpen = (v: boolean | ((o: boolean) => boolean)) => setOpenOn((typeof v === "function" ? v(open) : v) ? pathname : null);
+  const setOpen = (v: boolean) => setOpenOn(v ? pathname : null);
   const notifHref = role === "FARMER" ? "/farmer/notifications" : "/notifications";
 
   const badge = (item: NavItem) => {
     const n = item.badge === "notifications" ? unreadNotifications : item.badge === "messages" ? unreadMessages : 0;
-    return n > 0 ? <span className="ml-auto rounded-full bg-forest-500 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">{n > 99 ? "99+" : n}</span> : null;
+    return n > 0 ? <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-forest-500 px-1.5 text-[10px] font-bold text-white">{n > 99 ? "99+" : n}</span> : null;
   };
 
   const nav = (
     <nav className="flex flex-col gap-5 px-3 pb-6" aria-label="Main">
       {NAV[role].map((group, gi) => (
         <div key={gi} className="flex flex-col gap-0.5">
-          {group.title && <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-forest-200/60">{group.title}</p>}
+          {group.title && <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-navy-400">{group.title}</p>}
           {group.items.map((item) => {
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
@@ -56,11 +56,11 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  active ? "bg-white/12 text-white shadow-inner" : "text-forest-100/80 hover:bg-white/6 hover:text-white",
+                  "group flex items-center gap-3 rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-all duration-200",
+                  active ? "bg-ink text-white shadow-[0_8px_18px_-10px_rgb(13_17_22/0.6)]" : "text-navy-600 hover:bg-white/80 hover:text-navy-900",
                 )}
               >
-                <Icon className={cn("size-[18px] shrink-0", active ? "text-forest-300" : "text-forest-200/70")} />
+                <Icon className={cn("size-[18px] shrink-0 transition-transform duration-200", active ? "text-white" : "text-navy-500 group-hover:scale-110 group-hover:text-navy-800")} />
                 {item.label}
                 {badge(item)}
               </Link>
@@ -72,65 +72,67 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
   );
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh">
       {demoMode && (
-        <div className="no-print sticky top-0 z-40 flex items-center justify-center gap-2 bg-harvest-500 px-3 py-1 text-center text-xs font-semibold text-navy-900">
-          DEMO MODE · fictional sample data for demonstration
+        <div className="no-print sticky top-0 z-40 flex items-center justify-center gap-2 bg-harvest-100/90 px-3 py-1 text-center text-[11px] font-semibold tracking-wide text-harvest-800 backdrop-blur">
+          <span className="size-1.5 rounded-full bg-harvest-500" /> DEMO MODE · fictional sample data
         </div>
       )}
-      {/* Desktop sidebar */}
-      <aside className={cn("no-print fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-forest-900 lg:flex", demoMode && "top-6")}>
+
+      {/* Desktop sidebar: floating frosted panel */}
+      <aside className={cn("no-print fixed bottom-3 left-3 z-30 hidden w-64 flex-col rounded-[1.75rem] glass shadow-[var(--shadow-card)] lg:flex", demoMode ? "top-9" : "top-3")}>
         <div className="flex h-16 shrink-0 items-center px-6">
-          <Link href="/" aria-label="AgriFlow AI home">
-            <Logo inverted />
+          <Link href="/" aria-label="AgriFlow AI home" className="transition-opacity hover:opacity-80">
+            <Logo />
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto pt-2">{nav}</div>
-        <div className="border-t border-white/10 p-4 text-xs text-forest-200/70">
-          Signed in as <span className="font-semibold text-white">{ROLE_LABEL[role]}</span>
+        <div className="flex-1 overflow-y-auto pt-1 [scrollbar-width:thin]">{nav}</div>
+        <div className="m-3 rounded-2xl bg-white/70 px-4 py-3 text-xs text-navy-500">
+          Signed in as <span className="font-semibold text-navy-900">{ROLE_LABEL[role]}</span>
         </div>
       </aside>
 
       {/* Mobile drawer */}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-navy-900/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-72 flex-col bg-forest-900 shadow-xl">
+          <div className="absolute inset-0 animate-fade-in bg-navy-900/25 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <aside className="glass-strong absolute inset-y-2 left-2 flex w-[18rem] animate-sheet-in flex-col rounded-[1.75rem] shadow-[var(--shadow-float)]">
             <div className="flex h-16 items-center justify-between px-5">
-              <Logo inverted />
-              <button onClick={() => setOpen(false)} className="rounded-md p-1.5 text-forest-100 hover:bg-white/10" aria-label="Close menu">
-                <X className="size-5" />
+              <Logo />
+              <button onClick={() => setOpen(false)} className="flex size-9 items-center justify-center rounded-full bg-white text-navy-700 shadow-sm active:scale-95" aria-label="Close menu">
+                <X className="size-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto pt-2">{nav}</div>
+            <div className="flex-1 overflow-y-auto pt-1">{nav}</div>
           </aside>
         </div>
       )}
 
-      <div className="lg:pl-64">
-        <header className={cn("no-print sticky z-20 flex h-16 items-center gap-3 border-b border-border bg-white/85 px-4 backdrop-blur sm:px-6", demoMode ? "top-6" : "top-0")}>
-          <button className="rounded-lg p-2 text-navy-600 hover:bg-navy-100 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
-            <Menu className="size-5" />
+      <div className="lg:pl-[17.5rem]">
+        <header className={cn("no-print sticky z-20 flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8", demoMode ? "top-6" : "top-0")}>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#e6eff3]/95 via-[#e6eff3]/70 to-transparent backdrop-blur-[2px] lg:from-transparent lg:via-transparent" aria-hidden />
+          <button className="relative flex size-10 items-center justify-center rounded-full bg-white/85 text-navy-800 shadow-sm active:scale-95 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
+            <Menu className="size-[18px]" />
           </button>
-          <Link href="/" className="lg:hidden" aria-label="Home">
+          <Link href="/" className="relative lg:hidden" aria-label="Home">
             <Logo compact />
           </Link>
-          <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+          <div className="relative ml-auto flex items-center gap-2 sm:gap-3">
             <ConnectionStatus />
-            <Link href={notifHref} className="relative rounded-lg p-2 text-navy-600 hover:bg-navy-100" aria-label={`Notifications (${unreadNotifications} unread)`}>
-              <Bell className="size-5" />
-              {unreadNotifications > 0 && <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-forest-500 text-[9px] font-bold text-white">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
+            <Link href={notifHref} className="relative flex size-10 items-center justify-center rounded-full bg-white/85 text-navy-800 shadow-sm ring-1 ring-black/[0.03] transition hover:bg-white active:scale-95" aria-label={`Notifications (${unreadNotifications} unread)`}>
+              <Bell className="size-[18px]" />
+              {unreadNotifications > 0 && <span className="absolute -right-0.5 -top-0.5 flex size-[18px] items-center justify-center rounded-full bg-forest-500 text-[9px] font-bold text-white ring-2 ring-white">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
             </Link>
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 rounded-full p-0.5 pr-2 hover:bg-navy-100" aria-label="Account menu">
-                <span className="flex size-8 items-center justify-center rounded-full bg-forest-800 text-xs font-bold text-white">{initials(name || email)}</span>
-                <span className="hidden max-w-[10rem] truncate text-sm font-medium text-navy-800 sm:block">{name}</span>
+              <DropdownMenuTrigger className="flex items-center gap-2 rounded-full bg-white/85 p-1 pr-1 shadow-sm ring-1 ring-black/[0.03] transition hover:bg-white sm:pr-3" aria-label="Account menu">
+                <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-forest-500 to-forest-800 text-xs font-bold text-white">{initials(name || email)}</span>
+                <span className="hidden max-w-[10rem] truncate text-sm font-semibold text-navy-800 sm:block">{name}</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>
                   <span className="block font-semibold text-navy-900">{name}</span>
                   <span className="block truncate">{email}</span>
-                  <span className="mt-1 block text-forest-700">{ROLE_LABEL[role]}</span>
+                  <span className="mt-1 block font-medium text-forest-700">{ROLE_LABEL[role]}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {role !== "ADMIN" && role !== "SUPER_ADMIN" && role !== "SUPPLIER" && (
@@ -146,7 +148,7 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => void clearOfflineData().finally(() => logoutAction())} className="text-red-700">
+                <DropdownMenuItem onSelect={() => void clearOfflineData().finally(() => logoutAction())} className="text-red-600">
                   <LogOut /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -154,17 +156,25 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12">{children}</main>
+        {/* key on pathname replays the entrance animation on every navigation */}
+        <main key={pathname} className="page-enter mx-auto w-full max-w-7xl px-4 pb-32 pt-4 sm:px-6 lg:px-8 lg:pb-12">
+          {children}
+        </main>
       </div>
 
-      {/* Mobile bottom tabs */}
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="Quick navigation">
+      {/* Mobile bottom tab bar (frosted) */}
+      <nav
+        className="no-print glass-strong fixed inset-x-2 bottom-2 z-30 grid grid-cols-5 rounded-[1.6rem] px-1 pb-[max(env(safe-area-inset-bottom),0.25rem)] pt-1 shadow-[var(--shadow-float)] lg:hidden"
+        aria-label="Quick navigation"
+      >
         {MOBILE_TABS[role].map((t) => {
           const active = isActive(pathname, t.href);
           const Icon = t.icon;
           return (
-            <Link key={t.href} href={t.href} className={cn("flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium", active ? "text-forest-700" : "text-navy-500")}>
-              <Icon className={cn("size-5", active && "text-forest-600")} />
+            <Link key={t.href} href={t.href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[11px] font-semibold transition-colors", active ? "text-ink" : "text-navy-400")}>
+              <span className={cn("flex h-8 w-11 items-center justify-center rounded-full transition-all duration-300", active ? "bg-ink text-white shadow-[0_6px_14px_-6px_rgb(13_17_22/0.6)]" : "")}>
+                <Icon className="size-[18px]" />
+              </span>
               {t.label}
             </Link>
           );

@@ -26,7 +26,7 @@ export async function MarketplaceBrowser({ searchParams, basePath, detailBase, e
   };
   return (
     <div className="space-y-6">
-      <form method="get" action={basePath} className="grid gap-3 rounded-2xl border border-border bg-white p-4 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto]">
+      <form method="get" action={basePath} className="grid gap-3 glass rounded-[1.75rem] p-4 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto]">
         {Object.entries(extraParams).map(([k, v]) => (
           <input key={k} type="hidden" name={k} value={v} />
         ))}

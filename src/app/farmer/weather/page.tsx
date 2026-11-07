@@ -41,7 +41,7 @@ export default async function WeatherPage({ searchParams }: { searchParams: Prom
       />
       <div className="mb-4 flex flex-wrap gap-2 text-sm">
         {farms.map((f) => (
-          <a key={f.id} href={`?farm=${f.id}`} className={cn("rounded-full px-3 py-1.5 font-medium ring-1", f.id === farm.id ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border")}>
+          <a key={f.id} href={`?farm=${f.id}`} className={cn("rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors", f.id === farm.id ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white")}>
             {f.name}
           </a>
         ))}

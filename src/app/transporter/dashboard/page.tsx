@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CheckCircle2, ClipboardList, Truck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/primitives";
-import { PageHeader, StatCard } from "@/components/layout/page";
+import { PageHeader, StatCard, HeroCard } from "@/components/layout/page";
 import { DeliveryList } from "@/components/logistics/delivery-list";
 import { requirePageRole } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
@@ -44,6 +44,7 @@ export default async function TransporterDashboard() {
           </Button>
         }
       />
+      <HeroCard className="mb-4" eyebrow={profile?.businessName ?? "AgriFlow transporter"} label="Fees from completed jobs" value={formatZMW(earned._sum.fee ?? 0)} meta={[["Completed jobs", String(earned._count)], ["Active jobs", String(active.length)], ["Open requests", String(open.length)]]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Open requests" value={open.length} hint="In your service areas" icon={ClipboardList} tone="amber" href="/transporter/requests" />
         <StatCard label="Active jobs" value={active.length} icon={Truck} tone="sky" href="/transporter/deliveries" />

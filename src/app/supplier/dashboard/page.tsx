@@ -3,7 +3,7 @@ import Link from "next/link";
 import { AlertTriangle, ClipboardList, Package, Plus, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives";
-import { PageHeader, StatCard } from "@/components/layout/page";
+import { PageHeader, StatCard, HeroCard } from "@/components/layout/page";
 import { OrderList } from "@/components/orders/order-list";
 import { GroupedBars } from "@/components/charts/charts";
 import { requirePageRole } from "@/lib/auth/session";
@@ -39,6 +39,7 @@ export default async function SupplierDashboard() {
           </Button>
         }
       />
+      <HeroCard className="mb-4" eyebrow={profile?.businessName ?? "AgriFlow supplier"} label="Completed sales revenue" value={formatZMW(sales.revenue)} meta={[["Completed orders", String(sales.completed)], ["Open orders", String(open.length)], ["Active products", String(products)]]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Active products" value={products} icon={Package} href="/supplier/products" />
         <StatCard label="Open orders" value={open.length} icon={ClipboardList} tone="sky" href="/supplier/orders" />

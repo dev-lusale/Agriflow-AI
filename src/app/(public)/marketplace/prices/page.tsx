@@ -53,7 +53,7 @@ export default async function PricesPage({ searchParams }: { searchParams: Promi
       )}
       <div className="flex flex-wrap gap-2">
         {crops.map((c) => (
-          <Link key={c.id} href={`?crop=${encodeURIComponent(c.name)}`} className={cn("rounded-full px-3 py-1.5 text-sm font-medium ring-1", c.id === crop?.id ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border")}>
+          <Link key={c.id} href={`?crop=${encodeURIComponent(c.name)}`} className={cn("rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 transition-colors", c.id === crop?.id ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white")}>
             {c.name}
           </Link>
         ))}

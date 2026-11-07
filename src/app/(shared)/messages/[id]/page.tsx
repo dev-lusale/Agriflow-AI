@@ -52,7 +52,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
               const mine = m.senderId === user.id;
               return (
                 <div key={m.id} className={cn("flex", mine && "justify-end")}>
-                  <div className={cn("max-w-[80%] rounded-2xl px-4 py-2.5", mine ? "rounded-br-sm bg-forest-800 text-white" : "rounded-bl-sm bg-navy-100 text-navy-900")}>
+                  <div className={cn("max-w-[80%] rounded-2xl px-4 py-2.5", mine ? "rounded-br-md bg-ink text-white" : "rounded-bl-sm bg-navy-100 text-navy-900")}>
                     <p className="whitespace-pre-wrap text-sm">{m.body}</p>
                     <p className={cn("mt-1 text-[10px]", mine ? "text-forest-200" : "text-navy-400")}>
                       {mine ? "You" : m.sender.profile?.fullName} · {formatDateTime(m.createdAt)}

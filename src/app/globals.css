@@ -1,55 +1,91 @@
 @import "tailwindcss";
 
-/* ───────── AgriFlow AI design tokens ───────── */
+/* ───────── AgriFlow AI design tokens ─────────
+   Visual language: soft sky-to-mint atmosphere, frosted white glass surfaces,
+   large radii, near-black pill actions, light-weight large numerals,
+   restrained colour (green = gain, red = loss) and an iridescent hero card. */
 @theme {
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-urbanist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --color-forest-50: #f0f7f2;
-  --color-forest-100: #dcefe2;
-  --color-forest-200: #b9dec6;
-  --color-forest-300: #8cc6a2;
-  --color-forest-400: #4fa572;
-  --color-forest-500: #16a34a; /* emerald */
-  --color-forest-600: #15803d;
-  --color-forest-700: #166534;
-  --color-forest-800: #14532d; /* forest green — primary */
+  --color-forest-50: #eef8f2;
+  --color-forest-100: #d9f0e2;
+  --color-forest-200: #b5e0c6;
+  --color-forest-300: #86c9a2;
+  --color-forest-400: #4fae78;
+  --color-forest-500: #1f9d5c; /* gain / brand accent */
+  --color-forest-600: #16834b;
+  --color-forest-700: #136b3e;
+  --color-forest-800: #14532d; /* AgriFlow forest */
   --color-forest-900: #0f3d22;
   --color-forest-950: #072414;
 
-  --color-navy-50: #f8fafc;
-  --color-navy-100: #f1f5f9;
-  --color-navy-200: #e2e8f0;
-  --color-navy-300: #cbd5e1;
-  --color-navy-400: #94a3b8;
-  --color-navy-500: #64748b;
-  --color-navy-600: #475569;
-  --color-navy-700: #334155;
-  --color-navy-800: #1e293b;
-  --color-navy-900: #0f172a; /* deep navy */
+  --color-navy-50: #f7f9fa;
+  --color-navy-100: #eff3f5;
+  --color-navy-200: #e2e8ec;
+  --color-navy-300: #c9d2d9;
+  --color-navy-400: #97a3ad;
+  --color-navy-500: #6e7a85; /* muted text */
+  --color-navy-600: #4c5864;
+  --color-navy-700: #343e48;
+  --color-navy-800: #1d252d;
+  --color-navy-900: #0e1318; /* ink */
 
-  --color-harvest-50: #fffbeb;
-  --color-harvest-100: #fef3c7;
-  --color-harvest-200: #fde68a;
-  --color-harvest-500: #f59e0b;
-  --color-harvest-600: #d97706;
-  --color-harvest-700: #b45309;
-  --color-harvest-800: #92400e;
+  --color-ink: #0d1116;
+  --color-sky-mist: #e7f0f4;
+  --color-mint-mist: #e8f3ee;
 
-  --color-background: #f8fafc;
+  --color-harvest-50: #fff8eb;
+  --color-harvest-100: #fdefcd;
+  --color-harvest-200: #f9dc95;
+  --color-harvest-500: #f0a020;
+  --color-harvest-600: #d4840c;
+  --color-harvest-700: #a9640a;
+  --color-harvest-800: #82490d;
+
+  --color-background: #eef3f5;
   --color-surface: #ffffff;
-  --color-border: #e2e8f0;
-  --color-ring: #16a34a;
+  --color-border: rgb(14 19 24 / 0.07);
+  --color-ring: #0d1116;
 
-  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(14 19 24 / 0.03), 0 8px 24px -12px rgb(14 19 24 / 0.10);
+  --shadow-lift: 0 2px 6px rgb(14 19 24 / 0.04), 0 18px 40px -16px rgb(14 19 24 / 0.18);
+  --shadow-float: 0 30px 60px -20px rgb(14 19 24 / 0.25);
 
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
-  --shadow-lift: 0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --animate-fade-in: fade-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-sheet-in: sheet-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
-  --animate-fade-in: fade-in 0.25s ease-out;
   @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
     }
     to {
       opacity: 1;
@@ -61,10 +97,20 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-navy-900 antialiased;
-    font-feature-settings: "cv11", "ss01";
+    @apply text-navy-900 antialiased;
+    background-color: var(--color-background);
+    /* soft sky + mint atmosphere with cloud-like highlights */
+    background-image:
+      radial-gradient(60rem 30rem at 8% -6%, rgb(255 255 255 / 0.9), transparent 60%),
+      radial-gradient(48rem 28rem at 92% 4%, rgb(214 236 246 / 0.95), transparent 62%),
+      radial-gradient(40rem 26rem at 50% 38%, rgb(255 255 255 / 0.55), transparent 65%),
+      radial-gradient(55rem 30rem at 85% 100%, rgb(222 240 231 / 0.9), transparent 60%),
+      linear-gradient(180deg, #e3eef3 0%, #edf3f4 40%, #f3f6f5 100%);
+    background-attachment: fixed;
+    font-feature-settings: "ss01", "cv01";
   }
   h1,
   h2,
@@ -72,18 +118,93 @@
   h4 {
     @apply tracking-tight text-navy-900;
   }
+  h1 {
+    @apply font-semibold;
+  }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-forest-500;
+    @apply outline-2 outline-offset-2 outline-ink;
   }
   ::selection {
-    @apply bg-forest-200 text-forest-900;
+    @apply bg-forest-100 text-forest-900;
   }
   input[type="number"]::-webkit-inner-spin-button {
     @apply opacity-40;
   }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
+  /* Frosted glass surface used by cards, sheets and navigation */
+  .glass {
+    background-color: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+    border: 1px solid rgb(255 255 255 / 0.75);
+  }
+  .glass-strong {
+    background-color: rgb(255 255 255 / 0.9);
+    -webkit-backdrop-filter: saturate(160%) blur(24px);
+    backdrop-filter: saturate(160%) blur(24px);
+    border: 1px solid rgb(255 255 255 / 0.85);
+  }
+  /* Iridescent "card" surface (hero balances, highlights) */
+  .iridescent {
+    background-color: #dfe9ee;
+    background-image:
+      radial-gradient(18rem 12rem at 88% 70%, rgb(255 149 120 / 0.55), transparent 60%),
+      radial-gradient(14rem 10rem at 72% 30%, rgb(255 205 120 / 0.45), transparent 60%),
+      radial-gradient(16rem 12rem at 100% 10%, rgb(173 140 255 / 0.35), transparent 60%),
+      radial-gradient(22rem 14rem at 10% 0%, rgb(255 255 255 / 0.95), transparent 60%),
+      linear-gradient(135deg, #e9f1f4 0%, #dbe8ee 45%, #e6efe9 100%);
+  }
+  .iridescent-dark {
+    background-color: #0f1418;
+    background-image:
+      radial-gradient(16rem 12rem at 90% 80%, rgb(255 120 110 / 0.45), transparent 60%),
+      radial-gradient(14rem 10rem at 70% 20%, rgb(255 196 110 / 0.3), transparent 60%),
+      radial-gradient(18rem 14rem at 0% 0%, rgb(31 157 92 / 0.45), transparent 60%),
+      linear-gradient(135deg, #10161b 0%, #182128 100%);
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .shimmer {
+    background: linear-gradient(90deg, rgb(14 19 24 / 0.05) 25%, rgb(14 19 24 / 0.1) 37%, rgb(14 19 24 / 0.05) 63%);
+    background-size: 400% 100%;
+    animation: var(--animate-shimmer);
+  }
+  .page-enter {
+    animation: var(--animate-fade-up);
+  }
+  .stagger > * {
+    animation: var(--animate-fade-up);
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 160ms;
+  }
+  .stagger > *:nth-child(n + 6) {
+    animation-delay: 200ms;
+  }
+
   .prose-ai {
     @apply text-[0.95rem] leading-relaxed text-navy-800;
   }
@@ -104,7 +225,7 @@
     @apply font-semibold text-navy-900;
   }
   .prose-ai blockquote {
-    @apply my-2 border-l-4 border-harvest-500 bg-harvest-50 px-3 py-2 text-harvest-800;
+    @apply my-2 rounded-r-lg border-l-4 border-harvest-500 bg-harvest-50 px-3 py-2 text-harvest-800;
   }
   .prose-ai code {
     @apply rounded bg-navy-100 px-1 py-0.5 text-[0.85em];

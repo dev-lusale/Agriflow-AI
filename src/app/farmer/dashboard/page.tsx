@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Bot, CalendarDays, ClipboardList, HeartPulse, ListChecks, Plus, Sprout, Tags, Tractor, Wallet, Warehouse } from "lucide-react";
+import { Bot, CalendarDays, ClipboardList, CloudSun, HeartPulse, ListChecks, Plus, Sprout, Tags, Tractor, Wallet, Warehouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, Progress, Badge } from "@/components/ui/primitives";
-import { EmptyState, PageHeader, StatCard } from "@/components/layout/page";
+import { Card, CardContent, CardHeader, CardTitle, Progress, Badge, Trend } from "@/components/ui/primitives";
+import { EmptyState, HeroCard, PageHeader, QuickAction, StatCard } from "@/components/layout/page";
 import { GroupedBars } from "@/components/charts/charts";
 import { WeatherCard, WeatherCardSkeleton } from "@/components/weather/weather-card";
 import { TaskCheck } from "@/components/farm/task-check";
@@ -30,9 +30,9 @@ export default async function FarmerDashboard() {
   return (
     <>
       <PageHeader
-        eyebrow={new Date().toLocaleDateString("en-ZM", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Lusaka" })}
+        eyebrow="Your Farm Overview"
         title={`Muli bwanji, ${firstName}`}
-        description="Here is what is happening across your farms today."
+        description={new Date().toLocaleDateString("en-ZM", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Lusaka" })}
         actions={
           <>
             <Button asChild variant="outline">
@@ -64,15 +64,48 @@ export default async function FarmerDashboard() {
         />
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label="Farms" value={o.farms.length} hint={`${formatNumber(hectares, 1)} ha registered`} icon={Tractor} href="/farmer/farms" />
-            <StatCard label="Active crops" value={o.activeCrops.length} hint="Planned or growing" icon={Sprout} href="/farmer/crops" />
-            <StatCard label="Open orders" value={o.openOrders} hint={`${o.listings} active listings`} icon={ClipboardList} tone="sky" href="/farmer/orders" />
-            <StatCard label="Net profit" value={formatZMW(fin.netProfit, { compact: true })} hint="Recorded actuals, all time" icon={Wallet} tone={Number(fin.netProfit) >= 0 ? "forest" : "amber"} href="/farmer/finances" />
+          <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
+            <HeroCard
+              eyebrow="AgriFlow farm account"
+              label="Net profit · recorded actuals"
+              value={formatZMW(fin.netProfit)}
+              badge={<Badge tone="slate" className="bg-white/70">ZMW</Badge>}
+              meta={[
+                ["Income", formatZMW(fin.totalIncome)],
+                ["Expenses", formatZMW(fin.totalExpenses)],
+                ["Area", `${formatNumber(hectares, 1)} ha`],
+              ]}
+              footer={
+                fin.monthly.length >= 2 ? (
+                  <Trend
+                    value={(() => {
+                      const m = fin.monthly.slice(-2).map((x) => Number(x.net));
+                      return m[0] === 0 ? 0 : ((m[1]! - m[0]!) / Math.abs(m[0]!)) * 100;
+                    })()}
+                    suffix=" net vs previous month"
+                  />
+                ) : undefined
+              }
+            />
+            <div className="grid grid-cols-2 gap-3 stagger">
+              <StatCard label="Farms" value={o.farms.length} hint={`${formatNumber(hectares, 1)} ha registered`} icon={Tractor} href="/farmer/farms" />
+              <StatCard label="Active crops" value={o.activeCrops.length} hint="Planned or growing" icon={Sprout} href="/farmer/crops" />
+              <StatCard label="Open orders" value={o.openOrders} hint={`${o.listings} active listings`} icon={ClipboardList} tone="sky" href="/farmer/orders" />
+              <StatCard label="Tasks due" value={o.tasks.length} hint="Next 14 days" icon={CalendarDays} tone="amber" href="/farmer/calendar" />
+            </div>
+          </div>
+
+          <div className="glass flex justify-between gap-2 overflow-x-auto rounded-[1.75rem] px-4 py-4 shadow-[var(--shadow-card)] sm:justify-around sm:px-8">
+            <QuickAction href="/farmer/activities?new=1" icon={ListChecks} label="Record" />
+            <QuickAction href="/farmer/assistant" icon={Bot} label="Ask AI" />
+            <QuickAction href="/farmer/crop-health" icon={HeartPulse} label="Crop health" />
+            <QuickAction href="/farmer/weather" icon={CloudSun} label="Weather" />
+            <QuickAction href="/farmer/listings?new=1" icon={Tags} label="Sell" />
+            <QuickAction href="/farmer/finances" icon={Wallet} label="Money" />
           </div>
 
           {o.lowStock > 0 && (
-            <Link href="/farmer/inventory" className="flex items-center gap-3 rounded-xl border border-harvest-200 bg-harvest-50 px-4 py-3 text-sm text-harvest-800 hover:bg-harvest-100">
+            <Link href="/farmer/inventory" className="flex items-center gap-3 rounded-2xl bg-harvest-50/90 px-4 py-3 text-sm font-medium text-harvest-800 ring-1 ring-harvest-200/60 backdrop-blur transition hover:bg-harvest-100">
               <Warehouse className="size-4" /> {o.lowStock} inventory item(s) are at or below their minimum stock level.
             </Link>
           )}
@@ -219,7 +252,7 @@ export default async function FarmerDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden bg-forest-900 text-white">
+              <Card className="iridescent-dark overflow-hidden border-0 text-white">
                 <div className="p-5">
                   <p className="flex items-center gap-2 font-semibold text-white">
                     <Bot className="size-4 text-forest-300" /> Ask AgriFlow AI

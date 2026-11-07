@@ -40,7 +40,7 @@ export const FULL_FAQ: { group: string; items: Faq[] }[] = [
 
 export function FaqList({ items }: { items: Faq[] }) {
   return (
-    <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-white">
+    <div className="divide-y divide-border overflow-hidden glass rounded-[1.75rem]">
       {items.map((f) => (
         <details key={f.q} className="group px-5 py-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-navy-900">

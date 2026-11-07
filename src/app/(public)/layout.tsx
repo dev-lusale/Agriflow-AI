@@ -9,7 +9,7 @@ import { getSetting } from "@/server/admin/settings";
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const [user, banner] = await Promise.all([getCurrentUser().catch(() => null), getSetting<string>("platform.maintenanceBanner", "")]);
   return (
-    <div className="flex min-h-dvh flex-col bg-white">
+    <div className="flex min-h-dvh flex-col">
       {env.demoMode && (
         <div className="bg-harvest-500 px-3 py-1 text-center text-xs font-semibold text-navy-900">
           DEMO MODE · This deployment uses fictional sample data for demonstration. <Link href="/auth/login" className="underline">Try a demo account</Link>

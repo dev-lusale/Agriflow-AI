@@ -41,8 +41,8 @@ export default function HowItWorksPage() {
         <Section key={f.who} title={f.who} muted={i % 2 === 1}>
           <ol className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
             {f.steps.map(([t, d], j) => (
-              <li key={t} className="rounded-2xl border border-border bg-white p-5 shadow-[var(--shadow-card)]">
-                <span className="flex size-8 items-center justify-center rounded-full bg-forest-800 text-sm font-bold text-white">{j + 1}</span>
+              <li key={t} className="glass rounded-[1.75rem] p-5 shadow-[var(--shadow-card)]">
+                <span className="flex size-8 items-center justify-center rounded-full bg-ink text-sm font-bold text-white">{j + 1}</span>
                 <p className="mt-3 font-semibold">{t}</p>
                 <p className="mt-1 text-sm text-navy-600">{d}</p>
               </li>

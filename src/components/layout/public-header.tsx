@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,78 +18,84 @@ const LINKS = [
   { href: "/about", label: "About" },
 ];
 
+/** Floating frosted pill navigation; expands into a glass sheet on mobile. */
 export function PublicHeader({ signedInHome }: { signedInHome?: string | null }) {
   const pathname = usePathname();
-  // Menu closes automatically on navigation: it is only open for the path it was opened on
   const [openOn, setOpenOn] = React.useState<string | null>(null);
   const open = openOn === pathname;
-  const setOpen = (v: boolean | ((o: boolean) => boolean)) => setOpenOn((typeof v === "function" ? v(open) : v) ? pathname : null);
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-white/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-        <Link href="/" aria-label="AgriFlow AI home">
-          <Logo />
-        </Link>
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className={cn("rounded-lg px-3 py-2 text-sm font-medium transition-colors", pathname.startsWith(l.href) ? "text-forest-700" : "text-navy-600 hover:text-navy-900")}>
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="ml-auto hidden items-center gap-2 sm:flex">
-          {signedInHome ? (
-            <Button asChild>
-              <Link href={signedInHome}>Open dashboard</Link>
-            </Button>
-          ) : (
-            <>
-              <Button asChild variant="ghost">
-                <Link href="/auth/login">Sign in</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/auth/register">Get started</Link>
-              </Button>
-            </>
-          )}
-        </div>
-        <button className="ml-auto rounded-lg p-2 text-navy-700 hover:bg-navy-100 sm:ml-0 lg:hidden" onClick={() => setOpen((o) => !o)} aria-label="Toggle menu" aria-expanded={open}>
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
-      </div>
-      {open && (
-        <div className="border-t border-border bg-white px-4 pb-4 lg:hidden">
-          <nav className="flex flex-col py-2">
+    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4">
+      <div className={cn("glass mx-auto max-w-7xl shadow-[var(--shadow-card)] transition-[border-radius] duration-300", open ? "rounded-[1.75rem]" : "rounded-full")}>
+        <div className="flex h-14 items-center gap-6 pl-4 pr-2 sm:pl-5">
+          <Link href="/" aria-label="AgriFlow AI home" className="transition-opacity hover:opacity-80">
+            <Logo />
+          </Link>
+          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="rounded-lg px-3 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50">
+              <Link
+                key={l.href}
+                href={l.href}
+                className={cn("rounded-full px-3.5 py-2 text-sm font-medium transition-colors", pathname.startsWith(l.href) ? "bg-white text-navy-900 shadow-sm" : "text-navy-600 hover:bg-white/70 hover:text-navy-900")}
+              >
                 {l.label}
               </Link>
             ))}
-            <Link href="/faq" className="rounded-lg px-3 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50">
-              FAQ
-            </Link>
-            <Link href="/contact" className="rounded-lg px-3 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50">
-              Contact
-            </Link>
           </nav>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="ml-auto hidden items-center gap-1.5 sm:flex">
             {signedInHome ? (
-              <Button asChild className="col-span-2">
-                <Link href={signedInHome}>Open dashboard</Link>
+              <Button asChild size="sm" className="h-10 px-4">
+                <Link href={signedInHome}>
+                  Open dashboard <ArrowRight />
+                </Link>
               </Button>
             ) : (
               <>
-                <Button asChild variant="outline">
+                <Button asChild variant="ghost" size="sm" className="h-10 px-4">
                   <Link href="/auth/login">Sign in</Link>
                 </Button>
-                <Button asChild>
+                <Button asChild size="sm" className="h-10 px-4">
                   <Link href="/auth/register">Get started</Link>
                 </Button>
               </>
             )}
           </div>
+          <button
+            className="ml-auto flex size-10 items-center justify-center rounded-full bg-white text-navy-800 shadow-sm active:scale-95 sm:ml-0 lg:hidden"
+            onClick={() => setOpenOn(open ? null : pathname)}
+            aria-label="Toggle menu"
+            aria-expanded={open}
+          >
+            {open ? <X className="size-[18px]" /> : <Menu className="size-[18px]" />}
+          </button>
         </div>
-      )}
+        {open && (
+          <div className="animate-fade-in px-3 pb-3 lg:hidden">
+            <nav className="grid grid-cols-2 gap-1 py-2">
+              {[...LINKS, { href: "/faq", label: "FAQ" }, { href: "/contact", label: "Contact" }].map((l) => (
+                <Link key={l.href} href={l.href} className="rounded-2xl px-3 py-2.5 text-sm font-medium text-navy-700 hover:bg-white">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="grid grid-cols-2 gap-2">
+              {signedInHome ? (
+                <Button asChild className="col-span-2">
+                  <Link href={signedInHome}>Open dashboard</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="outline">
+                    <Link href="/auth/login">Sign in</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/auth/register">Get started</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

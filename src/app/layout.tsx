@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Urbanist } from "next/font/google";
 import { Toaster } from "sonner";
 import { ServiceWorkerRegister } from "@/components/offline/sw-register";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
+const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14532D",
+  themeColor: "#E7F0F4",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -26,10 +26,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-ZM" className={jakarta.variable}>
+    <html lang="en-ZM" className={urbanist.variable}>
       <body className="font-sans">
         {children}
-        <Toaster position="top-center" richColors closeButton />
+        <Toaster position="top-center" richColors closeButton toastOptions={{ classNames: { toast: "!rounded-2xl !border-white/80 !font-sans !shadow-[0_18px_40px_-16px_rgb(14_19_24/0.25)] !backdrop-blur-xl" } }} />
         <ServiceWorkerRegister />
       </body>
     </html>

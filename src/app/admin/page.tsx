@@ -3,7 +3,7 @@ import Link from "next/link";
 import { AlertTriangle, Brain, ClipboardList, Flag, Grid3x3, Package, ShoppingCart, Sprout, Store, Tractor, Truck, Users, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, Table, THead, TBody, TR, TH, TD } from "@/components/ui/primitives";
-import { PageHeader, StatCard, StatusBadge } from "@/components/layout/page";
+import { PageHeader, StatCard, StatusBadge, HeroCard } from "@/components/layout/page";
 import { GroupedBars, RankedBars, StackedBars } from "@/components/charts/charts";
 import { requirePageRole } from "@/lib/auth/session";
 import { formatZMW } from "@/lib/money";
@@ -48,6 +48,7 @@ export default async function AdminOverview() {
           )}
         </div>
       )}
+      <HeroCard className="mb-4" eyebrow="AgriFlow platform" label="Completed marketplace sales" value={formatZMW(s.completedSalesValue)} meta={[["Farmers", formatNumber(s.farmers)], ["Farms", `${formatNumber(s.farms)} · ${formatNumber(s.registeredHectares, 1)} ha`], ["Active orders", String(s.activeOrders)]]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Farmers" value={formatNumber(s.farmers)} icon={Sprout} href="/admin/farmers" />
         <StatCard label="Buyers" value={formatNumber(s.buyers)} icon={ShoppingCart} tone="sky" href="/admin/buyers" />

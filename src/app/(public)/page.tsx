@@ -23,6 +23,7 @@ import { ListingCard } from "@/components/marketplace/listing-card";
 import { prisma } from "@/lib/db";
 import { listingCardInclude } from "@/server/marketplace/service";
 import { FaqList, HOME_FAQ } from "./faq-data";
+import { PhoneOverview, PhoneTrio } from "@/components/marketing/phone-mockups";
 
 export const revalidate = 300;
 
@@ -45,46 +46,53 @@ export default async function HomePage() {
   return (
     <>
       {/* ───────── Hero ───────── */}
-      <section className="relative overflow-hidden bg-forest-900">
-        <HeroBackdrop />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.05fr_1fr] lg:px-8">
-          <div>
-            <Badge tone="green" className="bg-white/10 text-forest-100 ring-white/20">
-              <Sprout className="size-3.5" /> Built for Zambian agriculture · Powered by Grok
-            </Badge>
-            <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] text-white sm:text-5xl lg:text-[3.4rem]">
-              Grow smarter. <span className="text-forest-300">Trade better.</span> Harvest more.
+      <section className="relative overflow-hidden">
+        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-12 sm:px-6 md:pt-20 lg:px-8">
+          <div className="mx-auto max-w-3xl animate-fade-up text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3.5 py-1.5 text-sm font-medium text-navy-600 shadow-sm ring-1 ring-black/[0.03] backdrop-blur">
+              <Sprout className="size-4 text-forest-600" /> Built for Zambian agriculture · Powered by Grok
+            </span>
+            <h1 className="mt-6 text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-[4.4rem]">
+              Grow smarter.
+              <br />
+              <span className="text-navy-400">Trade better.</span> Harvest more.
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-forest-100/85">
-              AgriFlow AI puts farm records, crop advice, weather, buyers, input suppliers, transport and farm finances in one app. It works on any smartphone and keeps working when the network drops.
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-navy-500">
+              Farm records, crop advice, weather, buyers, inputs, transport and finances in one calm, simple app. It works on any smartphone, even when the network drops.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg" variant="accent">
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button asChild size="lg">
                 <Link href="/auth/register?role=FARMER">
                   Register as a farmer <ArrowRight />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/25 bg-white/5 text-white hover:bg-white/10 hover:text-white">
+              <Button asChild size="lg" variant="secondary">
                 <Link href="/marketplace">
                   <ShoppingBasket /> Explore the marketplace
                 </Link>
               </Button>
             </div>
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-white/10 pt-6">
+            <dl className="stagger mx-auto mt-10 flex max-w-md justify-center divide-x divide-navy-200/70 rounded-full bg-white/60 px-2 py-3 shadow-sm ring-1 ring-black/[0.03] backdrop-blur">
               {[
                 [live.farmers, "farmers"],
-                [live.farms, "farms registered"],
+                [live.farms, "farms"],
                 [live.activeListings, "live listings"],
               ].map(([n, l]) => (
-                <div key={String(l)}>
-                  <dt className="text-xs text-forest-200/70">{l}</dt>
-                  <dd className="text-2xl font-bold text-white">{Number(n).toLocaleString("en-ZM")}</dd>
+                <div key={String(l)} className="flex-1 px-4">
+                  <dd className="num text-2xl font-light text-navy-900">{Number(n).toLocaleString("en-ZM")}</dd>
+                  <dt className="text-xs text-navy-500">{l}</dt>
                 </div>
               ))}
             </dl>
-            <p className="mt-2 text-[11px] text-forest-200/60">Live counts from this deployment{live.demo ? " (includes fictional demo accounts)" : ""}.</p>
+            <p className="mt-2 text-[11px] text-navy-400">Live counts from this deployment{live.demo ? " (includes fictional demo accounts)" : ""}.</p>
           </div>
-          <HeroPreview />
+          <div className="relative mt-14 hidden animate-fade-up [animation-delay:150ms] md:block">
+            <PhoneTrio />
+            <p className="mt-4 text-center text-xs text-navy-400">Product preview · illustrative screens</p>
+          </div>
+          <div className="mt-12 flex justify-center animate-fade-up md:hidden">
+            <PhoneOverview />
+          </div>
         </div>
       </section>
 
@@ -92,8 +100,8 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-forest-600">The problem</p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Farming in Zambia runs on scattered tools and guesswork.</h2>
+            <p className="text-sm font-medium text-navy-500">The problem</p>
+            <h2 className="mt-2 text-3xl font-semibold sm:text-[2.6rem] sm:leading-[1.1]">Farming in Zambia runs on scattered tools and guesswork.</h2>
             <p className="mt-4 text-navy-600">
               Advice, buyers, inputs, transport and records all sit in different places: phone calls, notebooks, middlemen and word of mouth. Each gap costs farmers yield, time and income.
             </p>
@@ -116,15 +124,15 @@ export default async function HomePage() {
       </section>
 
       {/* ───────── Features ───────── */}
-      <section className="bg-navy-50/70 py-20">
+      <section className="bg-white/35 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-wider text-forest-600">One connected ecosystem</p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Everything a farm business needs, from planting to payment.</h2>
+            <p className="text-sm font-medium text-navy-500">One connected ecosystem</p>
+            <h2 className="mt-2 text-3xl font-semibold sm:text-[2.6rem] sm:leading-[1.1]">Everything a farm business needs, from planting to payment.</h2>
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
-              <div key={f.t} className="rounded-2xl border border-border bg-white p-5 shadow-[var(--shadow-card)]">
+              <div key={f.t} className="glass rounded-[1.75rem] p-5 shadow-[var(--shadow-card)]">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-forest-50 text-forest-700">
                   <f.i className="size-5" />
                 </div>
@@ -147,8 +155,8 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-forest-600">Grok agricultural intelligence</p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">An advisor that knows your farm, not just farming.</h2>
+            <p className="text-sm font-medium text-navy-500">Grok agricultural intelligence</p>
+            <h2 className="mt-2 text-3xl font-semibold sm:text-[2.6rem] sm:leading-[1.1]">An advisor that knows your farm, not just farming.</h2>
             <p className="mt-4 text-navy-600">
               The AgriFlow AI Assistant runs on Grok by xAI and reads the farmer&apos;s own records: location, crops, planting dates, activities, weather and finances. Every figure comes from AgriFlow&apos;s database, never made up by the AI.
             </p>
@@ -166,10 +174,10 @@ export default async function HomePage() {
               ))}
             </ul>
           </div>
-          <div className="rounded-3xl border border-border bg-white p-4 shadow-[var(--shadow-lift)] sm:p-6">
+          <div className="glass rounded-[2rem] p-4 shadow-[var(--shadow-lift)] sm:p-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex size-8 items-center justify-center rounded-full bg-forest-800 text-white">
+                <span className="flex size-8 items-center justify-center rounded-full bg-ink text-white">
                   <Bot className="size-4" />
                 </span>
                 <span className="text-sm font-semibold">AgriFlow AI Assistant</span>
@@ -177,8 +185,8 @@ export default async function HomePage() {
               <Badge tone="slate">Example conversation</Badge>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-forest-800 px-4 py-2.5 text-white">My maize in Choma has yellow lower leaves. What should I do?</div>
-              <div className="max-w-[92%] rounded-2xl rounded-bl-sm bg-navy-50 px-4 py-3 text-navy-800">
+              <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-white">My maize in Choma has yellow lower leaves. What should I do?</div>
+              <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-white px-4 py-3 text-navy-800 shadow-sm ring-1 ring-black/[0.03]">
                 <p>Your records show <strong>5 ha of SC 513 maize planted 2 December</strong>, now about 5 weeks old, and no top-dressing recorded yet.</p>
                 <p className="mt-2">Yellowing that starts at the tip of lower leaves in a V shape usually points to <strong>nitrogen deficiency</strong>, which is common around top-dressing time.</p>
                 <p className="mt-2 text-xs text-navy-500">Uncertain: other causes such as waterlogging or streak virus look similar. A photo check or a visit from your camp officer can confirm.</p>
@@ -195,8 +203,8 @@ export default async function HomePage() {
       </section>
 
       {/* ───────── How it works ───────── */}
-      <section className="bg-forest-900 py-20 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="px-3 py-6 sm:px-4">
+        <div className="iridescent-dark mx-auto max-w-7xl rounded-[2.5rem] px-5 py-16 text-white shadow-[var(--shadow-float)] sm:px-10">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">How it works</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-4">
             {[
@@ -205,8 +213,8 @@ export default async function HomePage() {
               ["Sell & buy", "List produce for verified buyers, negotiate prices and order inputs from suppliers."],
               ["Deliver & get paid", "Book transporters, track delivery status, and watch profit update automatically."],
             ].map(([t, d], i) => (
-              <div key={t} className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
-                <span className="flex size-9 items-center justify-center rounded-full bg-forest-500 text-sm font-bold">{i + 1}</span>
+              <div key={t} className="rounded-[1.5rem] bg-white/[0.06] p-5 ring-1 ring-white/10 backdrop-blur transition hover:bg-white/[0.1]">
+                <span className="flex size-9 items-center justify-center rounded-full bg-white text-sm font-bold text-ink">{i + 1}</span>
                 <p className="mt-4 font-semibold">{t}</p>
                 <p className="mt-1 text-sm text-forest-100/75">{d}</p>
               </div>
@@ -219,7 +227,7 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-3">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-forest-600">Benefits for Zambian farmers</p>
+            <p className="text-sm font-medium text-navy-500">Benefits for Zambian farmers</p>
             <h2 className="mt-2 text-3xl font-bold">Designed for the field, not the office.</h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
@@ -244,11 +252,11 @@ export default async function HomePage() {
       </section>
 
       {/* ───────── Marketplace preview ───────── */}
-      <section className="bg-navy-50/70 py-20">
+      <section className="bg-white/35 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-forest-600">Marketplace</p>
+              <p className="text-sm font-medium text-navy-500">Marketplace</p>
               <h2 className="mt-2 text-3xl font-bold">Fresh listings from Zambian farms</h2>
             </div>
             <Button asChild variant="outline">
@@ -281,7 +289,7 @@ export default async function HomePage() {
             ["Recording fertilizer and labour costs showed me my groundnuts were more profitable than I thought.", "Grace N.", "Smallholder, Chipata (fictional)"],
             ["We find aggregated soybean lots by district and quality grade, and delivery status is visible to everyone.", "Lusaka Grain Traders", "Buyer (fictional)"],
           ].map(([q, n, r]) => (
-            <figure key={n} className="rounded-2xl border border-border bg-white p-6 shadow-[var(--shadow-card)]">
+            <figure key={n} className="glass rounded-[1.75rem] p-6 shadow-[var(--shadow-card)]">
               <blockquote className="text-navy-700">&ldquo;{q}&rdquo;</blockquote>
               <figcaption className="mt-4 text-sm">
                 <span className="font-semibold text-navy-900">{n}</span>
@@ -293,7 +301,7 @@ export default async function HomePage() {
       </section>
 
       {/* ───────── FAQ ───────── */}
-      <section className="bg-navy-50/70 py-20">
+      <section className="bg-white/35 py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <h2 className="text-center text-3xl font-bold">Frequently asked questions</h2>
           <div className="mt-8">
@@ -309,16 +317,15 @@ export default async function HomePage() {
 
       {/* ───────── CTA ───────── */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-forest-800 px-6 py-14 text-center sm:px-12">
-          <HeroBackdrop />
+        <div className="iridescent relative overflow-hidden rounded-[2.5rem] border border-white/80 px-6 py-16 text-center shadow-[var(--shadow-float)] sm:px-12">
           <div className="relative">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready for a better season?</h2>
-            <p className="mx-auto mt-3 max-w-xl text-forest-100/85">Create a free account as a farmer, buyer, input supplier or transporter.</p>
+            <h2 className="text-3xl font-semibold sm:text-5xl">Ready for a better season?</h2>
+            <p className="mx-auto mt-3 max-w-xl text-navy-600">Create a free account as a farmer, buyer, input supplier or transporter.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Button asChild size="lg" variant="accent">
+              <Button asChild size="lg">
                 <Link href="/auth/register">Create your account</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white">
+              <Button asChild size="lg" variant="secondary">
                 <Link href="/how-it-works">See how it works</Link>
               </Button>
             </div>
@@ -340,67 +347,4 @@ const FEATURES = [
   { i: Wallet, t: "Farm finances", d: "Income, costs and profit by crop and field, exportable to CSV and PDF." },
 ];
 
-function HeroBackdrop() {
-  return (
-    <svg className="pointer-events-none absolute inset-0 size-full opacity-[0.16]" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <pattern id="rows" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)">
-          <line x1="0" y1="0" x2="0" y2="22" stroke="#4fa572" strokeWidth="1.2" />
-        </pattern>
-      </defs>
-      <path d="M0 420 Q300 340 600 400 T1200 380 V600 H0Z" fill="url(#rows)" />
-      <path d="M0 500 Q350 440 700 490 T1200 470 V600 H0Z" fill="#16A34A" opacity="0.5" />
-      <circle cx="1040" cy="110" r="70" fill="#f59e0b" opacity="0.35" />
-    </svg>
-  );
-}
 
-function HeroPreview() {
-  return (
-    <div className="relative mx-auto w-full max-w-md lg:max-w-none" aria-label="Product preview">
-      <div className="rounded-3xl bg-white p-4 shadow-2xl ring-1 ring-black/5 sm:p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-navy-500">Kabwe Valley Farm · Central</p>
-            <p className="font-semibold">Season overview</p>
-          </div>
-          <Badge tone="amber">Product preview</Badge>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            ["Income", "K 86,400", "text-forest-700"],
-            ["Costs", "K 41,250", "text-navy-800"],
-            ["Net", "K 45,150", "text-forest-700"],
-          ].map(([l, v, c]) => (
-            <div key={l} className="rounded-xl bg-navy-50 p-3">
-              <p className="text-[11px] text-navy-500">{l}</p>
-              <p className={`text-sm font-bold ${c}`}>{v}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 flex h-24 items-end gap-1.5 rounded-xl bg-navy-50 p-3">
-          {[35, 52, 44, 70, 62, 85, 78, 92].map((h, i) => (
-            <div key={i} className="flex-1 rounded-t bg-forest-500/80" style={{ height: `${h}%` }} />
-          ))}
-        </div>
-        <div className="mt-3 space-y-2">
-          {[
-            ["Maize · Field A", "Vegetative · 5 wks", "blue"],
-            ["Soybeans · Field B", "Flowering", "green"],
-          ].map(([a, b, t]) => (
-            <div key={a} className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-sm">
-              <span className="font-medium">{a}</span>
-              <Badge tone={t as "blue" | "green"}>{b}</Badge>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="absolute -bottom-6 -left-4 hidden w-60 rounded-2xl bg-white p-3 shadow-xl ring-1 ring-black/5 sm:block">
-        <div className="flex items-center gap-2 text-xs font-semibold text-forest-800">
-          <CloudSun className="size-4 text-harvest-600" /> 7-day outlook
-        </div>
-        <p className="mt-1 text-xs text-navy-600">Heavy rain likely on Thursday. Hold off top-dressing until it passes.</p>
-      </div>
-    </div>
-  );
-}

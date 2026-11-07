@@ -40,7 +40,7 @@ export default async function CropsPage({ searchParams }: { searchParams: Promis
           ["HARVESTED", "Harvested"],
           ["FAILED", "Failed"],
         ].map(([v, l]) => (
-          <a key={v} href={v ? `?status=${v}` : "?"} className={`rounded-full px-3 py-1.5 font-medium ring-1 ${(sp.status ?? "") === v ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border"}`}>
+          <a key={v} href={v ? `?status=${v}` : "?"} className={`rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors ${(sp.status ?? "") === v ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white"}`}>
             {l}
           </a>
         ))}

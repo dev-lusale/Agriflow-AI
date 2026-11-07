@@ -35,12 +35,12 @@ export default async function FarmerMarketplacePage({ searchParams }: { searchPa
           </Button>
         }
       />
-      <div className="mb-5 inline-flex rounded-xl border border-border bg-white p-1 text-sm">
+      <div className="mb-5 inline-flex rounded-full bg-white/70 p-1 shadow-sm ring-1 ring-black/[0.04] backdrop-blur text-sm">
         {[
           ["inputs", "Agricultural inputs"],
           ["produce", "Produce market"],
         ].map(([k, l]) => (
-          <Link key={k} href={`?tab=${k}`} className={cn("rounded-lg px-4 py-1.5 font-medium", tab === k ? "bg-forest-800 text-white" : "text-navy-600 hover:text-navy-900")}>
+          <Link key={k} href={`?tab=${k}`} className={cn("rounded-full px-4 py-1.5 font-medium transition-colors", tab === k ? "bg-ink text-white shadow-sm" : "text-navy-600 hover:text-navy-900")}>
             {l}
           </Link>
         ))}

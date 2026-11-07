@@ -30,7 +30,7 @@ export default async function SuppliersPublicPage({ searchParams }: { searchPara
         {suppliers.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {suppliers.map((s) => (
-              <div key={s.id} className="rounded-2xl border border-border bg-white p-5 shadow-[var(--shadow-card)]">
+              <div key={s.id} className="glass rounded-[1.75rem] p-5 shadow-[var(--shadow-card)]">
                 <p className="flex items-center gap-1.5 font-semibold">
                   {s.supplierProfile?.businessName}
                   {s.verifiedAt && <BadgeCheck className="size-4 text-forest-600" aria-label="Verified" />}
@@ -49,18 +49,18 @@ export default async function SuppliersPublicPage({ searchParams }: { searchPara
       </Section>
       <Section title="Product catalogue" muted>
         <div className="mb-5 flex flex-wrap gap-2">
-          <Link href="/suppliers" className={`rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${!category ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border"}`}>
+          <Link href="/suppliers" className={`rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 transition-colors ${!category ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white"}`}>
             All
           </Link>
           {categories.map((c) => (
-            <Link key={c.id} href={`/suppliers?category=${c.slug}`} className={`rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${category === c.slug ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border"}`}>
+            <Link key={c.id} href={`/suppliers?category=${c.slug}`} className={`rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 transition-colors ${category === c.slug ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white"}`}>
               {c.name}
             </Link>
           ))}
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {products.slice(0, 24).map((p) => (
-            <div key={p.id} className="flex flex-col rounded-2xl border border-border bg-white p-5">
+            <div key={p.id} className="flex flex-col glass rounded-[1.75rem] p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-forest-50 text-forest-700">
                   <Package className="size-5" />

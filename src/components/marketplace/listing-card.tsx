@@ -15,7 +15,7 @@ export type ListingCardData = Prisma.ProduceListingGetPayload<{
 export function ListingCard({ listing, href }: { listing: ListingCardData; href: string }) {
   const img = listing.images[0];
   return (
-    <Link href={href} className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
+    <Link href={href} className="group flex flex-col overflow-hidden glass rounded-[1.75rem] shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
       <div className="relative aspect-[16/10]">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element

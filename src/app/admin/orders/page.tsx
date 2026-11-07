@@ -26,11 +26,11 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
     <>
       <PageHeader title="Orders" description={`${orders.length} orders shown · value ${formatZMW(total)}. Open an order to review its history or resolve a dispute.`} />
       <div className="mb-4 flex flex-wrap gap-2 text-sm">
-        <Link href="?" className={cn("rounded-full px-3 py-1.5 font-medium ring-1", !status ? "bg-forest-800 text-white ring-forest-800" : "bg-white ring-border")}>
+        <Link href="?" className={cn("rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors", !status ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 ring-black/5 hover:bg-white")}>
           All
         </Link>
         {(Object.keys(ORDER_STATUS_LABEL) as OrderStatus[]).map((s) => (
-          <Link key={s} href={`?status=${s}`} className={cn("rounded-full px-3 py-1.5 font-medium ring-1", status === s ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border")}>
+          <Link key={s} href={`?status=${s}`} className={cn("rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors", status === s ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white")}>
             {ORDER_STATUS_LABEL[s]}
           </Link>
         ))}

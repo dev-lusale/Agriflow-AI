@@ -22,7 +22,7 @@ export function DeliveryActions({ deliveryId, next, vehicles, canDecline }: { de
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {next.map((s) => (
-          <button key={s} type="button" onClick={() => setStatus(s)} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", status === s ? (s === "CANCELLED" ? "bg-red-600 text-white ring-red-600" : "bg-forest-800 text-white ring-forest-800") : "bg-white text-navy-700 ring-border")}>
+          <button key={s} type="button" onClick={() => setStatus(s)} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", status === s ? (s === "CANCELLED" ? "bg-red-600 text-white ring-red-600" : "bg-ink text-white ring-ink shadow-sm") : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white")}>
             {ACTION_LABEL[s] ?? DELIVERY_STATUS_LABEL[s]}
           </button>
         ))}

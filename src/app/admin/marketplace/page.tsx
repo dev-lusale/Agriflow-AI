@@ -35,7 +35,7 @@ export default async function AdminMarketplacePage({ searchParams }: { searchPar
           ["APPROVED", `Approved (${count("APPROVED")})`],
           ["ALL", "All"],
         ].map(([k, l]) => (
-          <Link key={k} href={`?filter=${k}`} className={cn("rounded-full px-3 py-1.5 font-medium ring-1", filter === k ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border")}>
+          <Link key={k} href={`?filter=${k}`} className={cn("rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors", filter === k ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white")}>
             {l}
           </Link>
         ))}

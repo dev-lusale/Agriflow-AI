@@ -96,7 +96,7 @@ export default function OfflinePage() {
             <CardTitle>New record</CardTitle>
             <div className="mt-2 inline-flex rounded-xl border border-border p-1 text-sm">
               {(["activity", "note", "task"] as const).map((k) => (
-                <button key={k} onClick={() => setKind(k)} className={cn("rounded-lg px-3 py-1 font-medium capitalize", kind === k ? "bg-forest-800 text-white" : "text-navy-600")}>
+                <button key={k} onClick={() => setKind(k)} className={cn("rounded-lg px-3 py-1 font-medium capitalize", kind === k ? "bg-ink text-white shadow-sm" : "text-navy-600")}>
                   {k}
                 </button>
               ))}

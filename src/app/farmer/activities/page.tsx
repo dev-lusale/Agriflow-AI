@@ -40,11 +40,11 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
       />
       {opts.length > 1 && (
         <div className="mb-4 flex flex-wrap gap-2 text-sm">
-          <a href="?" className={`rounded-full px-3 py-1.5 font-medium ring-1 ${!sp.farm ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border"}`}>
+          <a href="?" className={`rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors ${!sp.farm ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white"}`}>
             All farms
           </a>
           {opts.map((f) => (
-            <a key={f.id} href={`?farm=${f.id}`} className={`rounded-full px-3 py-1.5 font-medium ring-1 ${sp.farm === f.id ? "bg-forest-800 text-white ring-forest-800" : "bg-white text-navy-700 ring-border"}`}>
+            <a key={f.id} href={`?farm=${f.id}`} className={`rounded-full px-3.5 py-1.5 font-medium ring-1 transition-colors ${sp.farm === f.id ? "bg-ink text-white ring-ink shadow-sm" : "bg-white/80 text-navy-700 ring-black/5 hover:bg-white"}`}>
               {f.name}
             </a>
           ))}

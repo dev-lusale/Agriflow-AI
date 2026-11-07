@@ -136,7 +136,7 @@ test("D · buyer requests transport; transporter accepts, picks up and delivers"
 test("E · farmer records expenses and a sale; finances update", async ({ page }) => {
   await demoLogin(page, "Farmer");
   await page.goto("/farmer/finances");
-  const before = await page.getByText("Net profit", { exact: true }).locator("..").textContent();
+  const before = await page.getByText("Net profit", { exact: true }).locator("../..").textContent();
   for (const [type, cat, amount] of [
     ["EXPENSE", "FERTILIZER", "1200"],
     ["EXPENSE", "LABOUR", "800"],
@@ -152,7 +152,7 @@ test("E · farmer records expenses and a sale; finances update", async ({ page }
     await expectToast(page, "Transaction recorded");
   }
   await page.reload();
-  const after = await page.getByText("Net profit", { exact: true }).locator("..").textContent();
+  const after = await page.getByText("Net profit", { exact: true }).locator("../..").textContent();
   expect(after).not.toEqual(before);
   await expect(page.getByText(`E2E ${run} PRODUCE_SALE`)).toBeVisible();
   await page.goto("/farmer/assistant?q=" + encodeURIComponent("How much profit did my farm make?"));
