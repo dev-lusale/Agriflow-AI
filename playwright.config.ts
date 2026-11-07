@@ -17,7 +17,14 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [["list"]],
-  use: { baseURL: BASE, trace: "retain-on-failure", actionTimeout: 30_000, navigationTimeout: 90_000 },
+  use: {
+    baseURL: BASE,
+    trace: "retain-on-failure",
+    actionTimeout: 30_000,
+    navigationTimeout: 90_000,
+    // Optional: E2E_HOST_MAP="MAP example.vercel.app 76.76.21.21" when a network cannot route to some edge IPs
+    launchOptions: process.env.E2E_HOST_MAP ? { args: [`--host-resolver-rules=${process.env.E2E_HOST_MAP}`] } : undefined,
+  },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: process.env.E2E_BASE_URL
     ? undefined
