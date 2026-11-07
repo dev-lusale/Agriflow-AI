@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import type { ActionResult } from "@/lib/errors";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/primitives";
+import { DialogCloseContext } from "./form-dialog";
 
 type FormCtx = { errors?: Record<string, string[] | undefined>; pending: boolean };
 const Ctx = React.createContext<FormCtx>({ pending: false });
@@ -40,6 +41,7 @@ export function ActionForm<T>({
   const [errors, setErrors] = React.useState<FormCtx["errors"]>();
   const router = useRouter();
   const ref = React.useRef<HTMLFormElement>(null);
+  const closeDialog = React.useContext(DialogCloseContext);
 
   return (
     <Ctx.Provider value={{ errors, pending }}>
@@ -60,6 +62,7 @@ export function ActionForm<T>({
               if (msg) toast.success(msg);
               if (resetOnSuccess) ref.current?.reset();
               onSuccess?.(res.data);
+              closeDialog?.();
               if (refresh) router.refresh();
             } else {
               setErrors(res.fieldErrors);
@@ -90,7 +93,7 @@ export function SubmitButton({ children, ...props }: ButtonProps) {
 
 type Common = { name: string; label: string; hint?: React.ReactNode; required?: boolean; className?: string };
 
-export function TextField({ name, label, hint, required, className, ...rest }: Common & React.InputHTMLAttributes<HTMLInputElement>) {
+export function TextField({ name, label, hint, required, className, ...rest }: Common & React.InputHTMLAttributes<HTMLInputElement> & { ref?: React.Ref<HTMLInputElement> }) {
   const { errors } = useFormCtx();
   const err = errors?.[name];
   return (

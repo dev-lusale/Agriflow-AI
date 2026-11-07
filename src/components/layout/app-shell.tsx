@@ -10,6 +10,7 @@ import { cn, initials } from "@/lib/utils";
 import { ROLE_LABEL } from "@/lib/auth/roles";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dialog";
 import { ConnectionStatus } from "@/components/offline/connection-status";
+import { clearOfflineData } from "@/lib/offline/queue";
 import { logoutAction } from "@/server/auth/actions";
 import { MOBILE_TABS, NAV, type NavItem } from "./nav-config";
 
@@ -31,7 +32,9 @@ function isActive(pathname: string, href: string) {
 export function AppShell({ role, name, email, unreadNotifications, unreadMessages, demoMode, children }: ShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
-  React.useEffect(() => setOpen(false), [pathname]);
+  React.useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
   const notifHref = role === "FARMER" ? "/farmer/notifications" : "/notifications";
 
   const badge = (item: NavItem) => {
@@ -143,7 +146,7 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => void logoutAction()} className="text-red-700">
+                <DropdownMenuItem onSelect={() => void clearOfflineData().finally(() => logoutAction())} className="text-red-700">
                   <LogOut /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

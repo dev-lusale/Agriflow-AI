@@ -96,7 +96,10 @@ export async function deleteEstimate(actor: Actor, id: string) {
 export function transactionsToCsv(
   rows: Array<{ date: Date; type: string; category: TransactionCategory; amount: Prisma.Decimal; description: string | null; farm?: { name: string } | null; cropRecord?: { crop: { name: string } } | null }>,
 ) {
-  const esc = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const esc = (raw: string) => {
+    const v = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw; // block spreadsheet formula injection
+    return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  };
   const header = "Date,Type,Category,Amount (ZMW),Farm,Crop,Description,Recorded as";
   const lines = rows.map((r) =>
     [r.date.toISOString().slice(0, 10), r.type, r.category, r.amount.toFixed(2), r.farm?.name ?? "", r.cropRecord?.crop.name ?? "", r.description ?? "", "ACTUAL"]

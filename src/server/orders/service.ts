@@ -239,7 +239,7 @@ export async function transitionOrder(actor: Actor, orderId: string, to: OrderSt
 
     const recipients = [order.buyerId, order.sellerId].filter((id) => id !== actor.id || opts.system);
     for (const uid of recipients) {
-      const area = uid === order.buyerId ? (order.type === "INPUT" ? "farmer/purchases" : "buyer/orders") : order.type === "INPUT" ? "supplier/orders" : "farmer/orders";
+      const area = uid === order.buyerId ? (order.type === "INPUT" ? "farmer/orders" : "buyer/orders") : order.type === "INPUT" ? "supplier/orders" : "farmer/orders";
       await notify(
         uid,
         {
