@@ -18,7 +18,7 @@
 ## Input & output safety
 - Zod validation runs on the server for every action. Prices, totals and ownership IDs are never trusted from the client.
 - Stock reservation uses conditional atomic updates, so concurrent buyers cannot oversell.
-- Uploads: magic-byte type detection (JPEG, PNG, WebP; JPEG and PNG for AI), 5 MB limit, content-type mismatch rejection, per-user upload rate limit. Files are served with `nosniff` and a restrictive CSP. Private files are served `no-store` after an authorisation check.
+- Uploads: magic-byte type detection (JPEG, PNG, WebP; JPEG and PNG for AI), 4 MB limit, content-type mismatch rejection, per-user upload rate limit. Files are served with `nosniff` and a restrictive CSP. Private files are served `no-store` after an authorisation check.
 - CSV exports neutralise spreadsheet formulas. AI Markdown is rendered as React elements with no raw HTML.
 - Security headers: `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`. `X-Powered-By` is disabled.
 

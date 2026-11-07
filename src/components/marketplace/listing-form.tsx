@@ -50,7 +50,7 @@ export function ListingForm({ crops, farms, listing, defaults }: { crops: { id: 
       {!listing && (
         <div className="sm:col-span-2">
           <label className="text-sm font-medium text-navy-700" htmlFor="photos">
-            Photos (up to 4, JPEG/PNG/WebP, max 5 MB each)
+            Photos (up to 4, JPEG/PNG/WebP, max 4 MB each)
           </label>
           <input id="photos" name="photos" type="file" multiple accept="image/jpeg,image/png,image/webp" className="mt-1.5 block w-full text-sm text-navy-600 file:mr-3 file:rounded-lg file:border-0 file:bg-forest-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-forest-800" />
         </div>

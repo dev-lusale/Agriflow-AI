@@ -7,7 +7,7 @@ import { ActionForm, SelectField, SubmitButton, TextAreaField, useFormCtx } from
 import { assessCropHealthAction } from "@/server/actions/ai";
 import type { FarmOpt } from "@/components/farm/forms";
 
-const MAX = 5 * 1024 * 1024;
+const MAX = 4 * 1024 * 1024;
 
 export function CropHealthForm({ crops, farms }: { crops: { id: string; name: string }[]; farms: FarmOpt[] }) {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function CropHealthForm({ crops, farms }: { crops: { id: string; name: st
 
       <div>
         <p className="text-sm font-medium text-navy-700">Photograph (recommended)</p>
-        <p className="text-xs text-navy-500">JPEG or PNG, up to 5 MB. Take a close, well-lit photo of the affected leaves.</p>
+        <p className="text-xs text-navy-500">JPEG or PNG, up to 4 MB. Take a close, well-lit photo of the affected leaves.</p>
         <input
           ref={fileRef}
           type="file"
@@ -41,7 +41,7 @@ export function CropHealthForm({ crops, farms }: { crops: { id: string; name: st
             setFileError(null);
             if (!f) return setPreview(null);
             if (f.size > MAX) {
-              setFileError("This photo is larger than 5 MB. Please choose a smaller one.");
+              setFileError("This photo is larger than 4 MB. Please choose a smaller one.");
               e.target.value = "";
               return setPreview(null);
             }

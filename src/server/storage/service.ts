@@ -27,7 +27,7 @@ export async function saveImage(actor: Actor, file: File, kind: UploadKind) {
     const path = `${kind.toLowerCase()}/${actor.id}/${sha256.slice(0, 16)}-${Date.now()}.${ext}`;
     const res = await fetch(`${env.supabaseUrl}/storage/v1/object/${env.supabaseBucket}/${path}`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${env.supabaseServiceKey}`, "Content-Type": v.mimeType, "x-upsert": "false" },
+      headers: { Authorization: `Bearer ${env.supabaseServiceKey}`, apikey: env.supabaseServiceKey!, "Content-Type": v.mimeType, "x-upsert": "false" },
       body: bytes,
     });
     if (!res.ok) throw new AppError("File storage is unavailable. Please try again.", "UNAVAILABLE");
@@ -53,7 +53,7 @@ export async function readUpload(actor: Actor | null, id: string) {
 export async function uploadBytes(up: { storage: string; data: Uint8Array | null; path: string | null }) {
   if (up.storage === "DATABASE") return up.data ? Buffer.from(up.data) : Buffer.alloc(0);
   const res = await fetch(`${env.supabaseUrl}/storage/v1/object/${env.supabaseBucket}/${up.path}`, {
-    headers: { Authorization: `Bearer ${env.supabaseServiceKey}` },
+    headers: { Authorization: `Bearer ${env.supabaseServiceKey}`, apikey: env.supabaseServiceKey! },
   });
   if (!res.ok) throw new AppError("File storage is unavailable.", "UNAVAILABLE");
   return Buffer.from(await res.arrayBuffer());

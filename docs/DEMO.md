@@ -5,7 +5,7 @@
 1. `npm run db:seed` for fresh demo data. Keep `DEMO_MODE=true`.
 2. Set `XAI_API_KEY` and confirm `/api/health` shows `"ai":"configured"`. Without a key, AI answers are labelled "Built-in guidance", so the demo still works.
 3. Open the site and log in once with each demo button to warm up the pages.
-4. Have a crop photo (JPEG/PNG under 5 MB) on the device, for example maize leaf damage.
+4. Have a crop photo (JPEG/PNG under 4 MB) on the device, for example maize leaf damage.
 5. Optional: install the PWA on a phone ("Add to Home screen") to show the mobile experience.
 
 All demo people, businesses, prices and weather samples are fictional and labelled **Demo**.

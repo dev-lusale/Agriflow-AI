@@ -30,7 +30,7 @@ Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind CSS v4 
 
 **Authentication.** The app uses its own server-side auth instead of Supabase Auth, so it runs on any PostgreSQL, including Supabase. Passwords are hashed with bcrypt. Sessions are stored in the database, and the cookie holds a random token (only its HMAC hash is stored), marked `httpOnly`, `SameSite=Lax` and `Secure` in production. Email verification and password reset use single-use tokens; phone verification uses OTP codes. Every page, action and route handler checks the role on the server.
 
-**Storage.** Supabase Storage is used when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set; otherwise images are stored in PostgreSQL. Uploads are checked by magic bytes, limited to 5 MB, and served through an authorisation check.
+**Storage.** Supabase Storage is used when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set; otherwise images are stored in PostgreSQL. Uploads are checked by magic bytes, limited to 4 MB, and served through an authorisation check.
 
 ---
 

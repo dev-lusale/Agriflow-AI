@@ -19,7 +19,9 @@
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:bootstrap": "tsx prisma/bootstrap.ts",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

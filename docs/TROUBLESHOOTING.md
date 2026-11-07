@@ -12,7 +12,7 @@
 | Crop-health "AI analysis unavailable" | The photo and description are saved. Use **Retry analysis** once AI is available. Vision needs a model that accepts image input (`XAI_VISION_MODEL`, default `grok-4.7`). |
 | Weather says "Location needed" | The farm's district has no reference point. Add GPS to the farm (**Edit → Use my current location**). |
 | Weather shows "last saved reading" | Open-Meteo is unreachable from the server. Check outbound internet access from the host. |
-| Images don't upload | Use JPEG/PNG/WebP under 5 MB (JPEG/PNG for crop health). On Vercel without Supabase storage, images are stored in Postgres, which is fine for demos. |
+| Images don't upload | Use JPEG/PNG/WebP under 4 MB (JPEG/PNG for crop health). On Vercel without Supabase storage, images are stored in Postgres, which is fine for demos. |
 | PWA doesn't install or `/offline` is blank offline | The service worker registers only in production (`npm run build && npm start`) over HTTPS or localhost. Visit `/offline` once while online so the farm list is cached. |
 | Offline item stuck on "Sync failed" | Open `/offline` to see the reason. Validation failures (e.g. a deleted farm) need your action: retry or discard. Network failures retry automatically with backoff. |
 | `Not enough stock left on this listing to confirm` | Another buyer confirmed first. The farmer can increase the quantity or the order can be cancelled. |

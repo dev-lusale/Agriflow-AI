@@ -1,0 +1,8 @@
+.local-db
+.env
+.env.*
+!.env.example
+test-results
+playwright-report
+*.log
+assets

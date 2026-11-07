@@ -1,5 +1,5 @@
 /** File-upload validation (pure, unit-tested). Content type is detected from magic bytes, never trusted from the client. */
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
+export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel caps request bodies at 4.5 MB)
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 export type AllowedImageType = (typeof ALLOWED_IMAGE_TYPES)[number];
 
