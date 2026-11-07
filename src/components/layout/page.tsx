@@ -64,7 +64,7 @@ export function HeroCard({ eyebrow, label, value, meta, footer, className, badge
       <div className="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-white/40 blur-3xl" aria-hidden />
       <div className="relative flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-navy-800">
-          <LogoMark className="size-7 rounded-lg" />
+          <span className="flex size-9 items-center justify-center rounded-xl bg-white/90 shadow-sm"><LogoMark className="h-5 w-7" /></span>
           {eyebrow}
         </div>
         {badge}

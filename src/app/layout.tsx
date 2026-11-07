@@ -15,6 +15,15 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "AgriFlow AI", statusBarStyle: "default" },
   formatDetection: { telephone: false },
+  openGraph: {
+    type: "website",
+    siteName: "AgriFlow AI Zambia",
+    title: "AgriFlow AI Zambia — Grow Smarter. Trade Better. Harvest More.",
+    description: "Farm management, Grok-powered agricultural advice, a produce marketplace, input supply, logistics and farm finances for Zambian farmers.",
+    locale: "en_ZM",
+  },
+  twitter: { card: "summary_large_image", title: "AgriFlow AI Zambia", description: "Grow Smarter. Trade Better. Harvest More." },
+  icons: { icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/icon.svg", type: "image/svg+xml" }], apple: "/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {

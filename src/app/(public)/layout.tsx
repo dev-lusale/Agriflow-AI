@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/brand/logo";
+import { LogoLockup } from "@/components/brand/logo";
 import { PublicHeader } from "@/components/layout/public-header";
 import { getCurrentUser } from "@/lib/auth/session";
 import { ROLE_HOME } from "@/lib/auth/roles";
@@ -18,11 +18,12 @@ export default async function PublicLayout({ children }: { children: React.React
       {banner ? <div role="status" className="bg-sky-50 px-3 py-1.5 text-center text-sm text-sky-900">{banner}</div> : null}
       <PublicHeader signedInHome={user ? ROLE_HOME[user.role] : null} />
       <main className="flex-1">{children}</main>
-      <footer className="bg-navy-900 text-navy-300">
+      <footer className="px-3 pb-3 sm:px-4">
+        <div className="glass mx-auto max-w-7xl rounded-[2rem] text-navy-600 shadow-[var(--shadow-card)]">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)] lg:px-8">
           <div>
-            <Logo inverted />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy-400">
+            <LogoLockup className="w-44" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy-500">
               Grow Smarter. Trade Better. Harvest More. An AI-powered agricultural ecosystem built for Zambian farmers and agribusinesses.
             </p>
             <p className="mt-4 text-xs text-navy-500">AI assistance powered by Grok (xAI). Weather data by Open-Meteo.</p>
@@ -31,11 +32,12 @@ export default async function PublicLayout({ children }: { children: React.React
           <FooterCol title="Company" links={[["About", "/about"], ["For farmers", "/farmers"], ["FAQ", "/faq"], ["Contact", "/contact"]]} />
           <FooterCol title="Legal" links={[["Privacy notice", "/privacy"], ["Terms of use", "/terms"]]} />
         </div>
-        <div className="border-t border-white/10">
+        <div className="border-t border-border">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-navy-500 sm:flex-row sm:justify-between sm:px-6 lg:px-8">
             <p>© {new Date().getFullYear()} AgriFlow AI Zambia. Hackathon prototype.</p>
             <p>Prices in Zambian Kwacha (ZMW). AI guidance is advisory; verify with an extension officer.</p>
           </div>
+        </div>
         </div>
       </footer>
     </div>
@@ -45,11 +47,11 @@ export default async function PublicLayout({ children }: { children: React.React
 function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-white">{title}</p>
+      <p className="text-sm font-semibold text-navy-900">{title}</p>
       <ul className="mt-4 space-y-2.5 text-sm">
         {links.map(([l, h]) => (
           <li key={h}>
-            <Link href={h} className="hover:text-white">
+            <Link href={h} className="transition-colors hover:text-navy-900">
               {l}
             </Link>
           </li>

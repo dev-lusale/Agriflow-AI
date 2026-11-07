@@ -5,7 +5,7 @@
  * - Authenticated pages and all /api requests are NEVER cached (private data stays off-device caches);
  *   when offline they fall back to the /offline page, which works from IndexedDB drafts.
  */
-const VERSION = "agriflow-v1";
+const VERSION = "agriflow-v2";
 const SHELL = `${VERSION}-shell`;
 const STATIC = `${VERSION}-static`;
 const PUBLIC_PAGES = ["/", "/about", "/how-it-works", "/features", "/farmers", "/marketplace", "/suppliers", "/logistics", "/contact", "/faq", "/privacy", "/terms"];
@@ -23,7 +23,7 @@ self.addEventListener("install", (event) => {
           const staticCache = await caches.open(STATIC);
           await Promise.all(assets.map((a) => staticCache.add(a).catch(() => null)));
         }
-        await cache.addAll(["/icon.svg", "/manifest.webmanifest"]).catch(() => null);
+        await cache.addAll(["/icon.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.ico"]).catch(() => null);
       } catch (e) {
         /* offline during install — will retry next time */
       }
@@ -49,7 +49,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return; // never cache API responses
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname === "/icon.svg") {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname === "/icon.svg") {
     event.respondWith(
       (async () => {
         const cache = await caches.open(STATIC);

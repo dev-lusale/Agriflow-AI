@@ -45,7 +45,7 @@ export function PhoneOverview() {
       <div className="px-4 pt-3">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-[11px] font-bold">
-            <LogoMark className="size-5 rounded-md" /> AgriFlow
+            <LogoMark className="h-4 w-6" /> AgriFlow
           </span>
           <span className="flex gap-1.5">
             <span className="flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
@@ -181,7 +181,7 @@ export function PhoneAI() {
           <div className="iridescent absolute inset-x-0 top-6 rounded-2xl border border-white/80 p-3 shadow-lg">
             <p className="flex items-center justify-between text-[9px] font-semibold">
               <span className="flex items-center gap-1">
-                <LogoMark className="size-4 rounded" /> Grok assessment
+                <LogoMark className="h-3.5 w-5" /> Grok assessment
               </span>
               <HeartPulse className="size-3.5 text-red-500" />
             </p>

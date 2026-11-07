@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { Logo } from "@/components/brand/logo";
+import { Logo, LogoLockup } from "@/components/brand/logo";
 import { PhoneOverview } from "@/components/marketing/phone-mockups";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-dvh gap-3 p-3 lg:grid-cols-[1.05fr_1fr]">
       <aside className="iridescent relative hidden overflow-hidden rounded-[2.25rem] border border-white/80 p-10 shadow-[var(--shadow-float)] lg:flex lg:flex-col">
-        <Link href="/" className="w-fit transition-opacity hover:opacity-80">
-          <Logo />
+        <Link href="/" className="w-fit transition-opacity hover:opacity-80" aria-label="AgriFlow AI home">
+          <LogoLockup className="w-56 drop-shadow-[0_10px_20px_rgb(13_17_22/0.12)]" priority />
         </Link>
         <div className="mt-10 max-w-md">
           <p className="text-sm font-medium text-navy-500">AgriFlow AI Zambia</p>
