@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, ShoppingCart, Sprout, Store, Truck } from "lucide-react";
@@ -26,7 +26,7 @@ export function RegisterForm({ defaultRole }: { defaultRole: string }) {
     resolver: zodResolver(registerSchema),
     defaultValues: { role: defaultRole as RegisterInput["role"], fullName: "", email: "", password: "", phone: undefined, consent: undefined },
   });
-  const role = form.watch("role");
+  const role = useWatch({ control: form.control, name: "role" });
   const errors = form.formState.errors;
 
   const onSubmit = form.handleSubmit((values) => {

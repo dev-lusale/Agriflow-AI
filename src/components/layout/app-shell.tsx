@@ -31,10 +31,10 @@ function isActive(pathname: string, href: string) {
 
 export function AppShell({ role, name, email, unreadNotifications, unreadMessages, demoMode, children }: ShellProps) {
   const pathname = usePathname();
-  const [open, setOpen] = React.useState(false);
-  React.useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Menu closes automatically on navigation: it is only open for the path it was opened on
+  const [openOn, setOpenOn] = React.useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (v: boolean | ((o: boolean) => boolean)) => setOpenOn((typeof v === "function" ? v(open) : v) ? pathname : null);
   const notifHref = role === "FARMER" ? "/farmer/notifications" : "/notifications";
 
   const badge = (item: NavItem) => {

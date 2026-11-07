@@ -12,22 +12,18 @@ import { allOps, cacheGet, cacheSet, enqueue, keepMineOnConflict, onQueueChange,
 import { statusLabel, type QueuedOp } from "@/lib/offline/queue-logic";
 import type { FarmOpt } from "@/components/farm/forms";
 import { cn, toDateInput } from "@/lib/utils";
+import { useOnline } from "@/lib/offline/use-online";
 
 const TONE: Record<QueuedOp["status"], "amber" | "blue" | "green" | "red"> = { pending: "amber", syncing: "blue", synced: "green", failed: "red", conflict: "red" };
 
 /** Works without a connection: drafts are stored on this device (IndexedDB) and synced automatically. */
 export default function OfflinePage() {
-  const [online, setOnline] = React.useState(true);
+  const online = useOnline();
   const [ops, setOps] = React.useState<QueuedOp[]>([]);
   const [farms, setFarms] = React.useState<FarmOpt[] | null>(null);
   const [kind, setKind] = React.useState<"activity" | "note" | "task">("activity");
 
   React.useEffect(() => {
-    setOnline(navigator.onLine);
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
     const refresh = () => void allOps().then(setOps).catch(() => setOps([]));
     refresh();
     const unsub = onQueueChange(refresh);
@@ -49,8 +45,6 @@ export default function OfflinePage() {
       } else if (!cached) setFarms([]);
     })();
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
       unsub();
     };
   }, []);

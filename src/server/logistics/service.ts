@@ -160,7 +160,7 @@ export async function updateDelivery(actor: Actor, input: z.input<typeof deliver
     const target = orderStatusForDelivery(d.status as DeliveryStatus);
     let current = result.order.status;
     if (target === "IN_TRANSIT" && current === "PROCESSING") {
-      await transitionOrder(actor, result.order.id, "READY_FOR_PICKUP", "Picked up by transporter", { system: true }).catch(() => null);
+      await transitionOrder(actor, result.order.id, "READY_FOR_PICKUP", "Collected by transporter", { system: true });
       current = "READY_FOR_PICKUP";
     }
     if (target && target !== current && canTransition(current, target, "SYSTEM")) {

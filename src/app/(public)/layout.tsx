@@ -4,9 +4,10 @@ import { PublicHeader } from "@/components/layout/public-header";
 import { getCurrentUser } from "@/lib/auth/session";
 import { ROLE_HOME } from "@/lib/auth/roles";
 import { env } from "@/lib/env";
+import { getSetting } from "@/server/admin/settings";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser().catch(() => null);
+  const [user, banner] = await Promise.all([getCurrentUser().catch(() => null), getSetting<string>("platform.maintenanceBanner", "")]);
   return (
     <div className="flex min-h-dvh flex-col bg-white">
       {env.demoMode && (
@@ -14,6 +15,7 @@ export default async function PublicLayout({ children }: { children: React.React
           DEMO MODE · This deployment uses fictional sample data for demonstration. <Link href="/auth/login" className="underline">Try a demo account</Link>
         </div>
       )}
+      {banner ? <div role="status" className="bg-sky-50 px-3 py-1.5 text-center text-sm text-sky-900">{banner}</div> : null}
       <PublicHeader signedInHome={user ? ROLE_HOME[user.role] : null} />
       <main className="flex-1">{children}</main>
       <footer className="bg-navy-900 text-navy-300">

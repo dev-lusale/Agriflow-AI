@@ -20,10 +20,10 @@ const LINKS = [
 
 export function PublicHeader({ signedInHome }: { signedInHome?: string | null }) {
   const pathname = usePathname();
-  const [open, setOpen] = React.useState(false);
-  React.useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Menu closes automatically on navigation: it is only open for the path it was opened on
+  const [openOn, setOpenOn] = React.useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (v: boolean | ((o: boolean) => boolean)) => setOpenOn((typeof v === "function" ? v(open) : v) ? pathname : null);
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">

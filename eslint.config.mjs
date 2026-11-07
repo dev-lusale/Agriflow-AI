@@ -10,6 +10,8 @@ const config = [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
+      // Pages-Router rule; plain <a> is correct for file downloads from route handlers in the App Router
+      "@next/next/no-html-link-for-pages": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },

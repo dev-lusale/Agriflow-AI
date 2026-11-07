@@ -5,19 +5,15 @@ import Link from "next/link";
 import { CloudOff, RefreshCw, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { allOps, onQueueChange, startSyncLoop } from "@/lib/offline/queue";
+import { useOnline } from "@/lib/offline/use-online";
 
 /** Header indicator: online/offline state + offline items awaiting sync. */
 export function ConnectionStatus() {
-  const [online, setOnline] = React.useState(true);
+  const online = useOnline();
   const [pending, setPending] = React.useState(0);
   const [problems, setProblems] = React.useState(0);
 
   React.useEffect(() => {
-    setOnline(navigator.onLine);
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
     const refresh = async () => {
       try {
         const ops = await allOps();
@@ -31,8 +27,6 @@ export function ConnectionStatus() {
     startSyncLoop();
     const unsub = onQueueChange(refresh);
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
       unsub();
     };
   }, []);

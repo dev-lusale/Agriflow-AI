@@ -216,7 +216,7 @@ async function main() {
   const newMaize = await prisma.cropRecord.create({
     data: { farmId: choma.id, fieldId: fB.id, cropId: crops.Maize!, variety: "SC 513 (medium maturity)", areaPlanted: D(2), plantingDate: day("2026-12-01"), expectedHarvestDate: day("2027-04-20"), growthStage: "PLANNED", status: "PLANNED", estimatedYield: D(240), yieldUnit: "BAG_50KG", notes: "2026/27 rotation: maize after soybeans on Field B. Planting planned with the first effective rains." },
   });
-  const newSoy = await prisma.cropRecord.create({
+  await prisma.cropRecord.create({
     data: { farmId: choma.id, fieldId: fA.id, cropId: crops.Soybeans!, variety: "Safari", areaPlanted: D(3), plantingDate: day("2026-12-08"), expectedHarvestDate: day("2027-04-12"), growthStage: "PLANNED", status: "PLANNED", estimatedYield: D(6300), yieldUnit: "KG" },
   });
   const tomatoes = await prisma.cropRecord.create({

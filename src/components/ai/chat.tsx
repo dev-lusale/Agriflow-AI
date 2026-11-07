@@ -220,7 +220,7 @@ function MessageBubble({ msg, allowTasks, farms }: { msg: ChatMsg; allowTasks?: 
 
 function SuggestedTask({ messageId, index, task, farms }: { messageId: string; index: number; task: { title: string; due_in_days: number; activity_type: string }; farms?: { id: string; name: string }[] }) {
   const [state, setState] = React.useState<"idle" | "adding" | "added">("idle");
-  const due = new Date(Date.now() + task.due_in_days * 86400_000).toLocaleDateString("en-ZM", { day: "numeric", month: "short" });
+  const [due] = React.useState(() => new Date(Date.now() + task.due_in_days * 86400_000).toLocaleDateString("en-ZM", { day: "numeric", month: "short" }));
   return (
     <button
       type="button"
