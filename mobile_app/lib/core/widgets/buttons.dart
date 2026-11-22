@@ -44,7 +44,9 @@ class _PrimaryButtonState extends State<PrimaryButton> {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: widget.label,
+      label: widget.loading ? '${widget.label} (working…)' : widget.label,
+      excludeSemantics: true,
+      onTap: enabled ? widget.onPressed : null,
       child: GestureDetector(
         onTapDown: enabled ? (_) => setState(() => _down = true) : null,
         onTapCancel: () => setState(() => _down = false),

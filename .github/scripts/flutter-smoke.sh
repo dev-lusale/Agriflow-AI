@@ -35,14 +35,16 @@ read -r SW SH < <(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1 | tr x '
 swipe_up() { adb shell input swipe $((SW/2)) $((SH*3/4)) $((SW/2)) $((SH/4)) 300; sleep 1; }
 # Scroll down until $1 is on screen (max 6 swipes)
 scroll_to() { local i; for i in 1 2 3 4 5 6; do has "$1" && return 0; swipe_up; done; has "$1"; }
-has() { dump _has; grep -qi "$1" "$OUT/_has.xml"; }
+# Dismiss "X isn't responding" system dialogs from a slow emulator (choose "Wait")
+calm() { dump _anr; if grep -q "isn't responding" "$OUT/_anr.xml" 2>/dev/null; then tap "Wait" >/dev/null 2>&1 || adb shell input keyevent KEYCODE_BACK; sleep 2; fi; }
+has() { calm; dump _has; grep -qi "$1" "$OUT/_has.xml"; }
 
 adb wait-for-device
 adb shell wm size > "$OUT/screen-size.txt"; adb shell wm density >> "$OUT/screen-size.txt"
 adb logcat -c
 check "APK installs" "adb install -r '$APK' > '$OUT/install.log' 2>&1"
 adb shell am start -W -n "$PKG/.MainActivity" > "$OUT/launch.log" 2>&1
-sleep 12; shot 01-welcome
+sleep 12; calm; shot 01-welcome
 check "App process running" "adb shell pidof $PKG > /dev/null"
 check "Welcome screen shows 'Create an account' and 'Log in'" "has 'Create an account' && has 'Log in'"
 check "Logo has an accessible label" "has 'AgriFlow AI logo'"
