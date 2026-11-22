@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AgriFlow AI — offline</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #EEF3F5; color: #14361f; }
+  main { width: 100%; max-width: 380px; text-align: center; }
+  img { width: 112px; height: auto; }
+  h1 { font-size: 1.45rem; margin: 20px 0 8px; }
+  p { margin: 0 0 12px; line-height: 1.55; color: #3d5a47; }
+  ul { text-align: left; margin: 16px 0 24px; padding-left: 20px; color: #3d5a47; line-height: 1.6; }
+  button { width: 100%; min-height: 52px; border: 0; border-radius: 12px; background: #1f7a35; color: #fff;
+           font-size: 1rem; font-weight: 600; }
+  button:active { transform: translateY(1px); }
+  .status { margin-top: 14px; font-size: .9rem; min-height: 1.4em; }
+</style>
+</head>
+<body>
+<main>
+  <img src="mark.png" alt="AgriFlow AI">
+  <h1>You're offline</h1>
+  <p>AgriFlow AI couldn't reach the internet.</p>
+  <ul>
+    <li>Records you already saved on this phone are safe and will sync when you're back online.</li>
+    <li>AI advice, the marketplace and orders need a connection.</li>
+  </ul>
+  <button id="retry" type="button">Try again</button>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+</main>
+<script>
+  var APP = "https://agriflow-ai-wheat.vercel.app/";
+  var s = document.getElementById("status");
+  function go() {
+    if (!navigator.onLine) { s.textContent = "Still offline. Check mobile data or Wi-Fi."; return; }
+    s.textContent = "Connecting…";
+    window.location.replace(APP);
+  }
+  document.getElementById("retry").addEventListener("click", go);
+  window.addEventListener("online", go);
+</script>
+</body>
+</html>

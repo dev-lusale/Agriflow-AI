@@ -21,6 +21,8 @@ export type GrokCall<T> = {
   timeoutMs?: number;
   /** Parse/validate the structured output. Throwing here counts as an invalid response. */
   parse?: (raw: unknown) => T;
+  /** Extra attempts after a transient failure (429, 5xx, network). Default 2. Timeouts are not retried. */
+  retries?: number;
 };
 
 export type GrokResult<T> = {
@@ -37,6 +39,7 @@ export class GrokUnavailableError extends Error {
     message: string,
     public reason: "NOT_CONFIGURED" | "HTTP" | "TIMEOUT" | "INVALID_RESPONSE" | "NETWORK",
     public status?: number,
+    public retryAfter?: string | null,
   ) {
     super(message);
     this.name = "GrokUnavailableError";
@@ -61,7 +64,41 @@ export function extractOutputText(p: ResponsesPayload): string {
   return parts.join("");
 }
 
+/** HTTP statuses worth retrying: rate limited or a temporary server-side problem. */
+export const RETRYABLE_STATUS = new Set([408, 409, 429, 500, 502, 503, 504]);
+
+export function isRetryable(e: unknown): boolean {
+  if (!(e instanceof GrokUnavailableError)) return false;
+  if (e.reason === "NETWORK") return true;
+  return e.reason === "HTTP" && e.status !== undefined && RETRYABLE_STATUS.has(e.status);
+}
+
+/** Exponential backoff with jitter; honours Retry-After (capped so a serverless request never stalls). */
+export function backoffMs(attempt: number, retryAfter?: string | null): number {
+  const ra = retryAfter ? Number(retryAfter) : NaN;
+  if (Number.isFinite(ra) && ra >= 0) return Math.min(ra * 1000, 8_000);
+  return Math.min(500 * 2 ** attempt, 4_000) + Math.floor(Math.random() * 250);
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Call Grok with retries for transient failures. A timeout is not retried because the
+ * caller (a page request) would otherwise wait several minutes.
+ */
 export async function callGrok<T = string>(call: GrokCall<T>, fetchImpl: typeof fetch = fetch): Promise<GrokResult<T>> {
+  const retries = Math.max(0, Math.min(call.retries ?? 2, 4));
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await callGrokOnce(call, fetchImpl);
+    } catch (e) {
+      if (attempt >= retries || !isRetryable(e)) throw e;
+      await sleep(backoffMs(attempt, (e as GrokUnavailableError).retryAfter));
+    }
+  }
+}
+
+async function callGrokOnce<T>(call: GrokCall<T>, fetchImpl: typeof fetch): Promise<GrokResult<T>> {
   const apiKey = env.xaiApiKey;
   if (!apiKey) throw new GrokUnavailableError("XAI_API_KEY is not configured", "NOT_CONFIGURED");
   const model = call.model ?? env.xaiModel;
@@ -100,9 +137,14 @@ export async function callGrok<T = string>(call: GrokCall<T>, fetchImpl: typeof 
     } catch {
       /* ignore */
     }
-    throw new GrokUnavailableError(`xAI HTTP ${res.status}: ${detail}`, "HTTP", res.status);
+    throw new GrokUnavailableError(`xAI HTTP ${res.status}: ${redact(detail)}`, "HTTP", res.status, res.headers.get("retry-after"));
   }
-  const payload = (await res.json()) as ResponsesPayload;
+  let payload: ResponsesPayload;
+  try {
+    payload = (await res.json()) as ResponsesPayload;
+  } catch {
+    throw new GrokUnavailableError("Grok returned a non-JSON response", "INVALID_RESPONSE");
+  }
   const text = extractOutputText(payload);
   if (!text) throw new GrokUnavailableError("Empty response from Grok", "INVALID_RESPONSE");
   let data: T;
@@ -124,4 +166,11 @@ export async function callGrok<T = string>(call: GrokCall<T>, fetchImpl: typeof 
     outputTokens: payload.usage?.output_tokens ?? payload.usage?.completion_tokens ?? null,
     latencyMs,
   };
+}
+
+/** Remove anything that looks like a credential from text before it is logged or shown. */
+export function redact(text: string): string {
+  return text
+    .replace(/xai-[A-Za-z0-9_-]{8,}/g, "xai-***")
+    .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer ***");
 }

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/primitives";
 import { PageHeader } from "@/components/layout/page";
 import { Chat, type ChatMsg } from "@/components/ai/chat";
+import { GrokDiagnostics } from "@/components/admin/grok-diagnostics";
 import { requirePageRole } from "@/lib/auth/session";
 import { isAIConfigured } from "@/lib/env";
 import { cn, relativeTime } from "@/lib/utils";
@@ -78,6 +79,7 @@ export default async function AdminAIPage({ searchParams }: { searchParams: Prom
             </p>
             <p className="mt-1">Grok receives aggregated, non-personal statistics only, such as counts, totals by crop and province, and order status. No names, contacts or individual records are sent.</p>
           </div>
+          <GrokDiagnostics />
         </aside>
         <Chat key={activeId ?? "new"} conversationId={activeId} initialMessages={initial} send={adminChatAction} suggestions={SUGGESTIONS} placeholder="Ask about farmers, crops, orders, sales, inventory…" basePath="/admin/ai" assistantName="AgriFlow Business Intelligence" />
       </div>
