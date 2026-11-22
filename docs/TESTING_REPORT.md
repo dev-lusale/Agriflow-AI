@@ -62,13 +62,12 @@ The unit and widget tests cover:
 | Welcome screen and logo accessibility label | Pass | Pass |
 | Login screen matches the reference (all fields, social buttons, sign-up) | Pass | Pass |
 | Empty login shows field errors | Pass | Pass |
-| Google button says sign-in "is not set up yet" | See note | Pass |
+| Google button says sign-in "is not set up yet" | Pass | Pass |
 | Wrong password against the **live** API | Pass | Pass |
 | Register screen: fields, provinces from the live API, Expert and Distributor account types | Pass | Pass |
 | Launch with no network: app stays open | Pass | Pass |
 
-Note: on the Pixel 6 the message was on screen (see `pixel6-04-social.png`) but disappeared before the slower
-emulator finished reading the screen. The check now reads the screen first. See the latest release for its result.
+Final run (commit `2d06aa1`): **16 / 16 checks pass on each emulator**; every CI job is green.
 
 ## Bugs found by testing and fixed
 
@@ -76,6 +75,7 @@ emulator finished reading the screen. The check now reads the screen first. See 
 - "Don't have an account? Sign up" and "Already have an account? Log in" overflowed on narrow phones. They now wrap.
 - Buttons announced their label twice to screen readers ("Log In, Log In").
 - The release build failed because Android's linter needs Java 21; CI now uses Java 21.
+- Test tooling issues (not app bugs) were fixed in the emulator script: exact-label taps, closing a hung emulator launcher, and re-locating fields after the layout changes.
 
 ## Not tested, because not configured
 
