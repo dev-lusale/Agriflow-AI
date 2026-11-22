@@ -245,7 +245,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 18),
                 PrimaryButton(label: 'Register', loading: _busy, onPressed: _submit),
                 const SizedBox(height: 24),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, children: [
                   const Text('Already have an account? ', style: TextStyle(fontFamily: kFont, color: AppColors.muted, fontSize: 14.5)),
                   LinkText('Log in', onTap: () => context.pushReplacement('/login')),
                 ]),
