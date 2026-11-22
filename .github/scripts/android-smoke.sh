@@ -46,7 +46,14 @@ adb shell am force-stop "$PKG"
 adb shell svc wifi disable; adb shell svc data disable; sleep 3
 adb logcat -c
 adb shell am start -W -n "$PKG/.MainActivity" > "$OUT/launch-offline.log" 2>&1
-sleep 15; adb exec-out screencap -p > "$OUT/04-offline.png"
+sleep 15
+# Emulators under memory pressure sometimes kill Google Play services and every app using its
+# font provider. If the system killed us (not a crash), relaunch once and note it.
+if ! adb shell pidof "$PKG" > /dev/null && grep -q "depends on provider.*in dying proc" <(adb logcat -d); then
+  echo "INFO | offline: system killed the app with Play services (emulator memory); relaunched once" | tee -a "$OUT/emulator-checks.txt"
+  adb shell am start -W -n "$PKG/.MainActivity" >> "$OUT/launch-offline.log" 2>&1; sleep 15
+fi
+adb exec-out screencap -p > "$OUT/04-offline.png"
 adb logcat -d > "$OUT/logcat-offline.txt"
 check "Offline: app opens and stays in the foreground" "adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -q '$PKG'"
 check "Offline: no AgriFlow crash" "! grep -A2 'FATAL EXCEPTION' '$OUT/logcat-offline.txt' | grep -q 'Process: $PKG'"
