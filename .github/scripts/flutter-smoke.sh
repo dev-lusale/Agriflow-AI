@@ -43,6 +43,8 @@ scroll_to() { local i; for i in 1 2 3 4 5 6; do has "$1" && return 0; swipe_up; 
 # Dismiss "X isn't responding" system dialogs from a slow emulator (choose "Wait")
 # The emulator's own launcher sometimes hangs; closing it does not touch AgriFlow.
 calm() { local i; for i in 1 2 3; do dump _anr; grep -q "isn't responding" "$OUT/_anr.xml" 2>/dev/null || return 0; tap "Close app" >/dev/null 2>&1 || adb shell input keyevent KEYCODE_BACK; sleep 2; done; }
+# has_now: read the screen immediately (for short-lived messages); has: dismiss system dialogs first
+has_now() { dump _has; grep -qi "$1" "$OUT/_has.xml"; }
 has() { calm; dump _has; grep -qi "$1" "$OUT/_has.xml"; }
 
 adb wait-for-device
@@ -67,7 +69,7 @@ check "Empty login shows validation messages" "has 'Enter your email address'"
 
 # Social button is honest about missing OAuth
 scroll_to "Sign up" >/dev/null; tap "Log in with Google"; sleep 1; shot 04-social
-check "Google button says it is not set up" "has 'not set up yet'"
+check "Google button says it is not set up" "has_now 'not set up yet'"
 
 # Real server call with a wrong password (no account is created or changed)
 sleep 4  # let the snackbar go
@@ -82,6 +84,15 @@ for n in edits[:2]:
 PY
 if [ "$(wc -l < "$OUT/_edit.txt")" -ge 2 ]; then
   adb shell input tap $(sed -n 1p "$OUT/_edit.txt"); adb shell input text "smoke.test.nobody@example.com"
+  # typing clears the email error and moves the password field, so find it again
+  adb shell input keyevent KEYCODE_BACK; sleep 1; dump _fields
+  python3 - "$OUT/_fields.xml" > "$OUT/_edit.txt" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+edits = [n for n in ET.parse(sys.argv[1]).iter('node') if n.get('class') == 'android.widget.EditText']
+for n in edits[:2]:
+    x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
+    print((x1 + x2) // 2, (y1 + y2) // 2)
+PY
   adb shell input tap $(sed -n 2p "$OUT/_edit.txt"); adb shell input text "WrongPass123"
   adb shell input keyevent KEYCODE_BACK
   scroll_to 'Log In' >/dev/null; tap "Log In"; sleep 10; shot 05-login-wrong-password

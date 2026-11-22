@@ -106,7 +106,6 @@ void main() {
     expect(find.text('Create your account'), findsOneWidget);
     await t.enterText(find.byType(TextFormField).at(3), 'short');
     await t.enterText(find.byType(TextFormField).at(4), 'different');
-    // Scroll the form to the bottom, where the Register button lives.
     // Press Register (scrolling itself is covered by the emulator test).
     t.widget<PrimaryButton>(find.widgetWithText(PrimaryButton, 'Register')).onPressed!();
     await t.pumpAndSettle();
