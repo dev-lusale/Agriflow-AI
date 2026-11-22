@@ -21,16 +21,17 @@ jobs:
       AGRIFLOW_VERSION_CODE: ${{ github.run_number }}
       AGRIFLOW_VERSION_NAME: 1.0.${{ github.run_number }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
+      - name: Check Android SDK
+        run: echo "ANDROID_HOME=$ANDROID_HOME" && ls "$ANDROID_HOME/build-tools" | tail -3
       - name: Install JS dependencies and sync Capacitor
         run: |
           npm ci --ignore-scripts
@@ -49,7 +50,9 @@ jobs:
             echo "SIGNED=no" >> "$GITHUB_ENV"
           fi
 
-      - name: Build debug APK, release APK and release AAB
+      - id: gradle
+        name: Build debug APK, release APK and release AAB
+        continue-on-error: true
         env:
           AGRIFLOW_KEYSTORE_PASSWORD: ${{ secrets.AGRIFLOW_KEYSTORE_PASSWORD }}
           AGRIFLOW_KEY_ALIAS: ${{ secrets.AGRIFLOW_KEY_ALIAS }}
@@ -61,6 +64,8 @@ jobs:
           ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease 2>&1 | tee ../android-results/gradle-build.log
 
       - name: Inspect build outputs
+        if: steps.gradle.outcome == 'success'
+        continue-on-error: true
         run: |
           BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
           OUT=android-results
@@ -71,11 +76,14 @@ jobs:
           "$BT/apksigner" verify --print-certs "$REL" > $OUT/apksigner-release.txt 2>&1 || echo "release APK is not signed (no signing secrets configured)" >> $OUT/apksigner-release.txt
 
       - name: Enable KVM for the emulator
+        if: steps.gradle.outcome == 'success'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
 
       - name: Emulator smoke test (Android 14, API 34)
+        if: steps.gradle.outcome == 'success'
+        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -88,7 +96,8 @@ jobs:
       - name: Collect artifacts
         if: always()
         run: |
-          mkdir -p dist
+          mkdir -p dist android-results
+          [ -f android-results/gradle-build.log ] && tail -120 android-results/gradle-build.log > android-results/gradle-tail.log || true
           cp android/app/build/outputs/apk/debug/app-debug.apk dist/AgriFlowAI-${AGRIFLOW_VERSION_NAME}-debug.apk 2>/dev/null || true
           for f in android/app/build/outputs/apk/release/*.apk; do
             [ -f "$f" ] || continue
@@ -110,6 +119,7 @@ jobs:
             echo "## Emulator checks (API 34)"; echo '```'; cat android-results/emulator-checks.txt 2>/dev/null || echo "emulator test did not run"; cat android-results/emulator-totals.txt 2>/dev/null; echo '```'
             echo "## Package"; echo '```'; grep -E "^package|^uses-permission|^sdkVersion|^targetSdkVersion|^application-label" android-results/badging-debug.txt 2>/dev/null; echo '```'
           } > android-results/SUMMARY.md
+          echo "- Gradle build: ${{ steps.gradle.outcome }}" >> android-results/SUMMARY.md
           cat android-results/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
           zip -qr dist/android-test-results.zip android-results
 
@@ -119,11 +129,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete android-latest --cleanup-tag -y 2>/dev/null || true
-          gh release create android-latest dist/* android-results/*.png android-results/SUMMARY.md \
+          shopt -s nullglob
+          files=(dist/* android-results/*.png android-results/SUMMARY.md)
+          [ -f android-results/gradle-tail.log ] && files+=(android-results/gradle-tail.log)
+          gh release create android-latest "${files[@]}" \
             --prerelease --target "${{ github.sha }}" \
             --title "AgriFlow AI Android ${AGRIFLOW_VERSION_NAME} (latest build)" \
             --notes-file android-results/SUMMARY.md
 
       - name: Fail if the emulator test found problems
         if: always()
-        run: grep -q "failed=0" android-results/emulator-totals.txt
+        run: test "${{ steps.gradle.outcome }}" = success && grep -q "failed=0" android-results/emulator-totals.txt
