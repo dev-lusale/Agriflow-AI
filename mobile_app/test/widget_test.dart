@@ -1,3 +1,4 @@
+import 'package:agriflow_ai/core/widgets/buttons.dart';
 import 'package:agriflow_ai/core/theme/app_theme.dart';
 import 'package:agriflow_ai/features/authentication/application/auth_controller.dart';
 import 'package:agriflow_ai/features/authentication/presentation/auth_common.dart';
@@ -106,10 +107,8 @@ void main() {
     await t.enterText(find.byType(TextFormField).at(3), 'short');
     await t.enterText(find.byType(TextFormField).at(4), 'different');
     // Scroll the form to the bottom, where the Register button lives.
-    final form = find.descendant(of: find.byType(SingleChildScrollView), matching: find.byType(Scrollable)).first;
-    await t.scrollUntilVisible(find.text('Register'), 300, scrollable: form);
-    await t.pumpAndSettle();
-    await t.tap(find.text('Register'));
+    // Press Register (scrolling itself is covered by the emulator test).
+    t.widget<PrimaryButton>(find.widgetWithText(PrimaryButton, 'Register')).onPressed!();
     await t.pumpAndSettle();
     expect(find.text('At least 8 characters'), findsOneWidget);
     expect(find.text('Passwords do not match'), findsOneWidget);

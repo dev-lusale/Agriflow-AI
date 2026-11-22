@@ -21,7 +21,9 @@ nodes = []
 for n in ET.parse(sys.argv[1]).iter('node'):
     labels = [(n.get('text') or '').strip(), (n.get('content-desc') or '').strip()]
     nodes.append((n, labels))
-pick = next((n for n, ls in nodes if want in ls), None) or next((n for n, ls in nodes if any(want.lower() in l.lower() for l in ls)), None)
+pick = next((n for n, ls in nodes if want in ls), None)
+if pick is None:  # (an Element with no children is falsy, so never use `or` here)
+    pick = next((n for n, ls in nodes if any(want.lower() in l.lower() for l in ls)), None)
 if pick is not None:
     x1, y1, x2, y2 = map(int, re.findall(r'\d+', pick.get('bounds')))
     print((x1 + x2) // 2, (y1 + y2) // 2)
@@ -39,7 +41,8 @@ swipe_up() { adb shell input swipe $((SW/2)) $((SH*3/4)) $((SW/2)) $((SH/4)) 300
 # Scroll down until $1 is on screen (max 6 swipes)
 scroll_to() { local i; for i in 1 2 3 4 5 6; do has "$1" && return 0; swipe_up; done; has "$1"; }
 # Dismiss "X isn't responding" system dialogs from a slow emulator (choose "Wait")
-calm() { dump _anr; if grep -q "isn't responding" "$OUT/_anr.xml" 2>/dev/null; then tap "Wait" >/dev/null 2>&1 || adb shell input keyevent KEYCODE_BACK; sleep 2; fi; }
+# The emulator's own launcher sometimes hangs; closing it does not touch AgriFlow.
+calm() { local i; for i in 1 2 3; do dump _anr; grep -q "isn't responding" "$OUT/_anr.xml" 2>/dev/null || return 0; tap "Close app" >/dev/null 2>&1 || adb shell input keyevent KEYCODE_BACK; sleep 2; done; }
 has() { calm; dump _has; grep -qi "$1" "$OUT/_has.xml"; }
 
 adb wait-for-device
@@ -63,7 +66,7 @@ tap "Log In"; sleep 2; shot 03-login-validation
 check "Empty login shows validation messages" "has 'Enter your email address'"
 
 # Social button is honest about missing OAuth
-tap "Log in with Google"; sleep 1; shot 04-social
+scroll_to "Sign up" >/dev/null; tap "Log in with Google"; sleep 1; shot 04-social
 check "Google button says it is not set up" "has 'not set up yet'"
 
 # Real server call with a wrong password (no account is created or changed)
