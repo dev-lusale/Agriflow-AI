@@ -97,12 +97,16 @@ void main() {
   });
 
   testWidgets('registration enforces password rules, matching and terms', (t) async {
-    await t.pumpWidget(app(const RegisterScreen(), SignedOutAuth()));
+    t.view.physicalSize = const Size(390, 844) * 2;
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(app(const RegisterScreen(), SignedOutAuth(), size: const Size(390, 844)));
     await t.pumpAndSettle();
     expect(find.text('Create your account'), findsOneWidget);
     await t.enterText(find.byType(TextFormField).at(3), 'short');
     await t.enterText(find.byType(TextFormField).at(4), 'different');
-    await t.ensureVisible(find.text('Register'));
+    // Scroll the form to the bottom, where the Register button lives.
+    await t.drag(find.byType(SingleChildScrollView).first, const Offset(0, -4000));
     await t.pumpAndSettle();
     await t.tap(find.text('Register'));
     await t.pumpAndSettle();
