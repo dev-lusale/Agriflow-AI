@@ -120,7 +120,7 @@ jobs:
           sfx=$([ "$SIGNED" = yes ] && echo "" || echo "-UNSIGNED")
           for f in $O/flutter-apk/app-release*.apk $O/apk/release/app-release*.apk; do [ -f "$f" ] && cp "$f" "dist/AgriFlowAI-$BUILD_NAME-release$sfx.apk" && break; done
           [ -f $O/bundle/release/app-release.aab ] && cp $O/bundle/release/app-release.aab "dist/AgriFlowAI-$BUILD_NAME-release$sfx.aab"
-          (cd dist && sha256sum * > SHA256SUMS.txt)
+          (cd dist && ls *.apk *.aab >/dev/null 2>&1 && sha256sum *.apk *.aab > SHA256SUMS.txt)
           {
             echo "# AgriFlow AI (Flutter) — build $BUILD_NAME"
             echo; echo "- Commit: \`${{ github.sha }}\` on \`${{ github.ref_name }}\`"; echo "- Release signing: $SIGNED"; echo
@@ -140,7 +140,10 @@ jobs:
           shopt -s nullglob
           shots=(); for p in flutter-results/*/*.png; do n=$(echo "$p" | sed 's|flutter-results/||; s|/|-|'); cp "$p" "dist/$n"; done
           gh release delete flutter-latest --cleanup-tag -y 2>/dev/null
-          gh release create flutter-latest dist/* --prerelease --target "${{ github.sha }}" --title "AgriFlow AI Flutter $BUILD_NAME (latest build)" --notes-file flutter-results/SUMMARY.md
+          gh release create flutter-latest --prerelease --target "${{ github.sha }}" --title "AgriFlow AI Flutter $BUILD_NAME (latest build)" --notes-file flutter-results/SUMMARY.md || exit 1
+          rc=0
+          for f in dist/*; do [ -s "$f" ] || continue; gh release upload flutter-latest "$f" --clobber || rc=1; done
+          exit $rc
       - name: Fail on problems
         if: always()
         working-directory: .
