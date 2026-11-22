@@ -79,7 +79,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
 
   Widget _produce() {
     final crops = asJsonList(ref.watch(cropCatalogProvider).value?.data);
-    final query = Uri(queryParameters: {if (_q.isNotEmpty) 'q': _q, if (_crop != null) 'crop': _crop!, 'sort': _sort}).query;
+    final query = Uri(queryParameters: {if (_q.isNotEmpty) 'q': _q, 'crop': ?_crop, 'sort': _sort}).query;
     final v = ref.watch(listingsProvider(query));
     return Column(children: [
       SizedBox(
@@ -147,7 +147,7 @@ class _MarketScreenState extends ConsumerState<MarketScreen> {
 
   Widget _inputs() {
     final cats = asJsonList(ref.watch(categoriesProvider).value?.data);
-    final query = Uri(queryParameters: {if (_q.isNotEmpty) 'q': _q, if (_category != null) 'category': _category!}).query;
+    final query = Uri(queryParameters: {if (_q.isNotEmpty) 'q': _q, 'category': ?_category}).query;
     final v = ref.watch(productsProvider(query));
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       // Category rail, as in the reference design

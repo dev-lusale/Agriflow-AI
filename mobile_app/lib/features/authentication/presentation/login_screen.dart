@@ -132,7 +132,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ]),
                 const SizedBox(height: 32),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, children: [
                   const Text("Don't have an account? ", style: TextStyle(fontFamily: kFont, color: AppColors.muted, fontSize: 14.5)),
                   LinkText('Sign up', onTap: () => context.pushReplacement('/register')),
                 ]),

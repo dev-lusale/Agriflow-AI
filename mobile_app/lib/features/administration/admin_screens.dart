@@ -102,7 +102,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final query = Uri(queryParameters: {if (_role != null) 'role': _role!, if (_q.isNotEmpty) 'q': _q}).query;
+    final query = Uri(queryParameters: {'role': ?_role, if (_q.isNotEmpty) 'q': _q}).query;
     final v = ref.watch(adminUsersProvider(query));
     return PageScaffold(
       title: 'Users',
@@ -147,6 +147,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                           try {
                             if (a == 'verify' || a == 'unverify') await api.post('/admin/users/${u.s('id')}/verify', {'verified': a == 'verify'});
                             if (a == 'suspend' || a == 'activate') {
+                              if (!context.mounted) return;
                               if (a == 'suspend' && !await confirmDialog(context, title: 'Suspend this account?', message: 'They will be signed out and cannot log in until reactivated.', confirm: 'Suspend', destructive: true)) return;
                               await api.post('/admin/users/${u.s('id')}/status', {'status': a == 'suspend' ? 'SUSPENDED' : 'ACTIVE'});
                             }

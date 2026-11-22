@@ -14,7 +14,7 @@ import '../../core/widgets/states.dart';
 import '../farm_management/farm_providers.dart';
 import 'weather_widgets.dart';
 
-/// Query key: "farm:<id>", "gps:<lat>,<lng>" or "home".
+/// Query key: `farm:<id>`, `gps:<lat>,<lng>` or `home`.
 final weatherProvider = FutureProvider.family<Cached<dynamic>, String>((ref, key) {
   if (key.startsWith('farm:')) return cachedGet(ref, '/weather', query: {'farmId': key.substring(5)});
   if (key.startsWith('gps:')) {

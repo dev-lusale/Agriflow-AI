@@ -324,7 +324,10 @@ class MyListingsScreen extends ConsumerWidget {
                     PopupMenuButton<String>(
                       tooltip: 'Listing options',
                       onSelected: (a) async {
-                        if (a == 'view') return context.push('/market/listing/${l.s('id')}');
+                        if (a == 'view') {
+                          context.push('/market/listing/${l.s('id')}');
+                          return;
+                        }
                         try {
                           await ref.read(apiClientProvider).post('/marketplace/listings/${l.s('id')}/status', {'status': a});
                           ref.invalidate(myListingsProvider);

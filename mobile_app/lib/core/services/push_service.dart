@@ -28,9 +28,9 @@ class PushService {
       final fm = FirebaseMessaging.instance;
       final settings = await fm.requestPermission();
       if (settings.authorizationStatus == AuthorizationStatus.denied) return;
-      final token = await fm.getToken();
-      if (token != null) await api.post('/me/push-token', {'token': token, 'platform': 'android'});
-      fm.onTokenRefresh.listen((t) => api.post('/me/push-token', {'token': t, 'platform': 'android'}).catchError((_) => null));
+      // onRegistered emits the FCM token after register() and again whenever it changes.
+      fm.onRegistered.listen((t) => api.post('/me/push-token', {'token': t, 'platform': 'android'}).catchError((_) => null));
+      await fm.register();
       _ready = true;
     } catch (_) {
       _ready = false;

@@ -22,7 +22,8 @@ class MyFarmScreen extends ConsumerWidget {
     Future<void> refresh() async {
       ref.invalidate(cropRecordsProvider);
       ref.invalidate(activitiesProvider);
-      await ref.refresh(farmsProvider.future);
+      ref.invalidate(farmsProvider);
+      await ref.read(farmsProvider.future);
     }
 
     return Scaffold(

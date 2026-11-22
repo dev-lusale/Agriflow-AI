@@ -8,35 +8,35 @@ import '../../core/theme/app_theme.dart';
 import '../../models/app_user.dart';
 import '../authentication/application/auth_controller.dart';
 
-class _Tab {
-  const _Tab(this.label, this.icon, this.activeIcon);
+class AppTab {
+  const AppTab(this.label, this.icon, this.activeIcon);
   final String label;
   final IconData icon;
   final IconData activeIcon;
 }
 
 /// Labels for the 5 tabs depend on the account type (same branches for everyone).
-List<_Tab> tabsFor(AppUser? u) {
+List<AppTab> tabsFor(AppUser? u) {
   final role = u?.role ?? UserRole.unknown;
   final second = switch (role) {
-    UserRole.farmer => const _Tab('My Farm', Icons.agriculture_outlined, Icons.agriculture),
-    UserRole.supplier => const _Tab('Business', Icons.storefront_outlined, Icons.storefront),
-    UserRole.distributor => const _Tab('Business', Icons.local_shipping_outlined, Icons.local_shipping),
-    UserRole.transporter => const _Tab('Deliveries', Icons.local_shipping_outlined, Icons.local_shipping),
-    UserRole.expert => const _Tab('Cases', Icons.health_and_safety_outlined, Icons.health_and_safety),
-    UserRole.buyer => const _Tab('Deliveries', Icons.local_shipping_outlined, Icons.local_shipping),
-    UserRole.admin || UserRole.superAdmin => const _Tab('Admin', Icons.admin_panel_settings_outlined, Icons.admin_panel_settings),
-    _ => const _Tab('Work', Icons.work_outline, Icons.work),
+    UserRole.farmer => const AppTab('My Farm', Icons.agriculture_outlined, Icons.agriculture),
+    UserRole.supplier => const AppTab('Business', Icons.storefront_outlined, Icons.storefront),
+    UserRole.distributor => const AppTab('Business', Icons.local_shipping_outlined, Icons.local_shipping),
+    UserRole.transporter => const AppTab('Deliveries', Icons.local_shipping_outlined, Icons.local_shipping),
+    UserRole.expert => const AppTab('Cases', Icons.health_and_safety_outlined, Icons.health_and_safety),
+    UserRole.buyer => const AppTab('Deliveries', Icons.local_shipping_outlined, Icons.local_shipping),
+    UserRole.admin || UserRole.superAdmin => const AppTab('Admin', Icons.admin_panel_settings_outlined, Icons.admin_panel_settings),
+    _ => const AppTab('Work', Icons.work_outline, Icons.work),
   };
   final third = role == UserRole.farmer
-      ? const _Tab('AI Assistant', Icons.auto_awesome_outlined, Icons.auto_awesome)
-      : const _Tab('Orders', Icons.receipt_outlined, Icons.receipt);
+      ? const AppTab('AI Assistant', Icons.auto_awesome_outlined, Icons.auto_awesome)
+      : const AppTab('Orders', Icons.receipt_outlined, Icons.receipt);
   return [
-    const _Tab('Home', Icons.home_outlined, Icons.home),
+    const AppTab('Home', Icons.home_outlined, Icons.home),
     second,
     third,
-    const _Tab('Marketplace', Icons.storefront_outlined, Icons.storefront),
-    const _Tab('Profile', Icons.person_outline, Icons.person),
+    const AppTab('Marketplace', Icons.storefront_outlined, Icons.storefront),
+    const AppTab('Profile', Icons.person_outline, Icons.person),
   ];
 }
 

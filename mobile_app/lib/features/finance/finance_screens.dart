@@ -96,7 +96,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
         value: v,
         onRefresh: () async {
           ref.invalidate(transactionsProvider);
-          await ref.refresh(financeSummaryProvider(_period).future);
+          ref.invalidate(financeSummaryProvider(_period));
+          await ref.read(financeSummaryProvider(_period).future);
         },
         builder: (raw) {
           final s = asJson(raw);
