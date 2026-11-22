@@ -25,7 +25,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   }
   const conversations = await listConversations(actor);
   const other = conv.participants.find((p) => p.userId !== user.id)?.user;
-  const orderHref = conv.order ? (user.role === "BUYER" ? `/buyer/orders/${conv.order.id}` : user.role === "SUPPLIER" ? `/supplier/orders/${conv.order.id}` : `/farmer/orders/${conv.order.id}`) : null;
+  const orderHref = conv.order ? (user.role === "BUYER" ? `/buyer/orders/${conv.order.id}` : user.role === "SUPPLIER" || user.role === "DISTRIBUTOR" ? `/supplier/orders/${conv.order.id}` : `/farmer/orders/${conv.order.id}`) : null;
   return (
     <>
       <PageHeader back={{ href: "/messages", label: "Messages" }} title={other?.profile?.fullName ?? "Conversation"} description={conv.subject} />

@@ -14,7 +14,7 @@ import { listDeliveriesFor, openRequests } from "@/server/logistics/service";
 export const metadata: Metadata = { title: "Transporter dashboard" };
 
 export default async function TransporterDashboard() {
-  const user = await requirePageRole("TRANSPORTER");
+  const user = await requirePageRole("TRANSPORTER", "DISTRIBUTOR");
   const actor = { id: user.id, role: user.role };
   const [profile, open, mine, earned] = await Promise.all([
     prisma.transporterProfile.findUnique({ where: { userId: user.id } }),

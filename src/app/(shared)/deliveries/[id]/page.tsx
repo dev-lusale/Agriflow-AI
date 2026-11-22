@@ -30,11 +30,11 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
     throw e;
   }
   const party: DeliveryParty =
-    d.transporterId === user.id || (user.role === "TRANSPORTER" && !d.transporterId) ? "TRANSPORTER" : user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? "ADMIN" : "REQUESTER";
+    d.transporterId === user.id || ((user.role === "TRANSPORTER" || user.role === "DISTRIBUTOR") && !d.transporterId) ? "TRANSPORTER" : user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? "ADMIN" : "REQUESTER";
   const next = deliveryTransitions(d.status, party) as DeliveryStatus[];
   const vehicles = party === "TRANSPORTER" ? await prisma.vehicle.findMany({ where: { ownerId: user.id, isActive: true }, select: { id: true, type: true, registration: true, capacityKg: true } }) : [];
   const idx = DELIVERY_FLOW.indexOf(d.status);
-  const back = user.role === "TRANSPORTER" ? "/transporter/deliveries" : user.role === "BUYER" ? "/buyer/deliveries" : user.role === "FARMER" ? "/farmer/deliveries" : user.role === "SUPPLIER" ? "/supplier/orders" : "/admin/deliveries";
+  const back = user.role === "TRANSPORTER" || user.role === "DISTRIBUTOR" ? "/transporter/deliveries" : user.role === "BUYER" ? "/buyer/deliveries" : user.role === "FARMER" ? "/farmer/deliveries" : user.role === "SUPPLIER" ? "/supplier/orders" : "/admin/deliveries";
   const orderHref = d.order ? (user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? `/admin/orders/${d.order.id}` : user.role === "BUYER" ? `/buyer/orders/${d.order.id}` : user.role === "SUPPLIER" ? `/supplier/orders/${d.order.id}` : user.role === "FARMER" ? `/farmer/orders/${d.order.id}` : null) : null;
 
   return (

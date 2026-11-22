@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2, ShoppingCart, Sprout, Store, Truck } from "lucide-react";
+import { GraduationCap, Loader2, PackageOpen, ShoppingCart, Sprout, Store, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/primitives";
 import { registerSchema, type RegisterInput } from "@/lib/validation/schemas";
@@ -17,6 +17,8 @@ const ROLES = [
   { value: "BUYER", label: "Buyer", desc: "Source produce from farmers", icon: ShoppingCart },
   { value: "SUPPLIER", label: "Input supplier", desc: "Sell seed, fertilizer, equipment", icon: Store },
   { value: "TRANSPORTER", label: "Transporter", desc: "Deliver agricultural goods", icon: Truck },
+  { value: "EXPERT", label: "Agricultural expert", desc: "Give farmers a second opinion on crop problems", icon: GraduationCap },
+  { value: "DISTRIBUTOR", label: "Distributor", desc: "Sell inputs and deliver them", icon: PackageOpen },
 ] as const;
 
 /** Registration uses React Hook Form + Zod on the client; the server action re-validates everything. */

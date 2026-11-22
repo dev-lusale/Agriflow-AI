@@ -9,7 +9,7 @@ import { listOrders } from "@/server/orders/service";
 export const metadata: Metadata = { title: "Orders" };
 
 export default async function SupplierOrdersPage() {
-  const user = await requirePageRole("SUPPLIER");
+  const user = await requirePageRole("SUPPLIER", "DISTRIBUTOR");
   const orders = await listOrders({ id: user.id, role: user.role }, { as: "seller", type: "INPUT" });
   return (
     <>

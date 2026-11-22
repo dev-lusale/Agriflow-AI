@@ -135,9 +135,9 @@ export function AppShell({ role, name, email, unreadNotifications, unreadMessage
                   <span className="mt-1 block font-medium text-forest-700">{ROLE_LABEL[role]}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {role !== "ADMIN" && role !== "SUPER_ADMIN" && role !== "SUPPLIER" && (
+                {role !== "ADMIN" && role !== "SUPER_ADMIN" && role !== "SUPPLIER" && role !== "EXPERT" && (
                   <DropdownMenuItem asChild>
-                    <Link href={`/${role.toLowerCase()}/profile`}>
+                    <Link href={role === "DISTRIBUTOR" ? "/transporter/profile" : `/${role.toLowerCase()}/profile`}>
                       <User /> Profile
                     </Link>
                   </DropdownMenuItem>

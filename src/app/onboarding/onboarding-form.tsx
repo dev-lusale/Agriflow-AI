@@ -6,7 +6,7 @@ import { onboardingAction } from "@/server/auth/actions";
 import { PROVINCES } from "@/lib/zambia";
 
 type Props = {
-  role: "FARMER" | "BUYER" | "SUPPLIER" | "TRANSPORTER";
+  role: "FARMER" | "BUYER" | "SUPPLIER" | "TRANSPORTER" | "EXPERT" | "DISTRIBUTOR";
   defaults: { fullName: string; phone: string; province: string | null; district: string | null };
   crops: string[];
   categories: string[];
@@ -102,6 +102,30 @@ export function OnboardingForm({ role, defaults, crops, categories }: Props) {
           />
           <TextField name="baseRate" label="Base rate (ZMW)" type="number" min={0} step="0.01" hint="Optional" />
           <ChipGroup name="serviceProvinces" label="Provinces you serve" options={PROVINCES} />
+        </>
+      )}
+
+      {role === "EXPERT" && (
+        <>
+          <TextField name="organisation" label="Organisation" hint="e.g. ZARI, a university or an NGO (optional)" />
+          <TextField name="qualification" label="Qualification" hint="e.g. BSc Agronomy (optional)" />
+          <ChipGroup
+            name="specialisations"
+            label="Specialisations"
+            options={["Maize", "Wheat", "Soybeans", "Groundnuts", "Beans", "Cassava", "Vegetables", "Plant pathology", "Entomology (pests)", "Soil fertility", "Irrigation", "Livestock"]}
+          />
+          <p className="text-xs text-navy-500 sm:col-span-2">An administrator verifies expert accounts before farmers&apos; cases are shown to you.</p>
+        </>
+      )}
+
+      {role === "DISTRIBUTOR" && (
+        <>
+          <TextField name="businessName" label="Business name" required />
+          <TextField name="registrationNumber" label="Business registration no." hint="Optional (e.g. PACRA number)" />
+          <TextField name="contactPhone" label="Dispatch phone" type="tel" placeholder="+260 …" />
+          <TextAreaField name="description" label="About your business" className="sm:col-span-2" rows={3} />
+          <ChipGroup name="categories" label="Product categories" options={categories} />
+          <ChipGroup name="serviceProvinces" label="Provinces you deliver to" options={PROVINCES} />
         </>
       )}
 

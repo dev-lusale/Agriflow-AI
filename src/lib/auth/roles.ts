@@ -8,6 +8,8 @@ export const ROLE_HOME: Record<Role, string> = {
   TRANSPORTER: "/transporter/dashboard",
   ADMIN: "/admin",
   SUPER_ADMIN: "/admin",
+  EXPERT: "/expert/dashboard",
+  DISTRIBUTOR: "/supplier/dashboard",
 };
 
 export const ROLE_LABEL: Record<Role, string> = {
@@ -17,9 +19,18 @@ export const ROLE_LABEL: Record<Role, string> = {
   TRANSPORTER: "Transporter",
   ADMIN: "Administrator",
   SUPER_ADMIN: "Super administrator",
+  EXPERT: "Agricultural expert",
+  DISTRIBUTOR: "Distributor",
 };
 
-export const SELF_REGISTER_ROLES = ["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER"] as const;
+export const SELF_REGISTER_ROLES = ["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER", "EXPERT", "DISTRIBUTOR"] as const;
+
+/** Roles that sell inputs (products, stock, input orders). */
+export const isSellerRole = (r: Role) => r === "SUPPLIER" || r === "DISTRIBUTOR";
+/** Roles that carry deliveries. */
+export const isCarrierRole = (r: Role) => r === "TRANSPORTER" || r === "DISTRIBUTOR";
+export const SELLER_ROLES: Role[] = ["SUPPLIER", "DISTRIBUTOR"];
+export const CARRIER_ROLES: Role[] = ["TRANSPORTER", "DISTRIBUTOR"];
 
 export const isAdminRole = (r: Role) => r === "ADMIN" || r === "SUPER_ADMIN";
 
@@ -27,8 +38,9 @@ export const isAdminRole = (r: Role) => r === "ADMIN" || r === "SUPER_ADMIN";
 export const ROLE_AREAS: Record<string, Role[]> = {
   "/farmer": ["FARMER"],
   "/buyer": ["BUYER"],
-  "/supplier": ["SUPPLIER"],
-  "/transporter": ["TRANSPORTER"],
+  "/supplier": ["SUPPLIER", "DISTRIBUTOR"],
+  "/transporter": ["TRANSPORTER", "DISTRIBUTOR"],
+  "/expert": ["EXPERT"],
   "/admin": ["ADMIN", "SUPER_ADMIN"],
 };
 

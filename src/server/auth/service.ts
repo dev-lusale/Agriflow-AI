@@ -11,6 +11,8 @@ import { audit } from "@/lib/audit";
 import { isValidDistrict } from "@/lib/zambia";
 import {
   buyerOnboardingSchema,
+  distributorOnboardingSchema,
+  expertOnboardingSchema,
   farmerOnboardingSchema,
   registerSchema,
   supplierOnboardingSchema,
@@ -44,7 +46,7 @@ export async function consumeToken(token: string, type: TokenType) {
   return row.userId;
 }
 
-export async function registerUser(input: z.input<typeof registerSchema>) {
+export async function registerUser(input: z.input<typeof registerSchema>, opts: { sendLinkEmail?: boolean } = {}) {
   const data = registerSchema.parse(input);
   const exists = await prisma.user.findUnique({ where: { email: data.email } });
   if (exists) throw new AppError("An account with this email already exists. Try signing in.", "CONFLICT", { email: ["Email already registered"] });
@@ -63,7 +65,8 @@ export async function registerUser(input: z.input<typeof registerSchema>) {
     },
   });
   await audit({ actorId: user.id, action: "user.register", entityType: "User", entityId: user.id, metadata: { role: user.role } });
-  await sendVerificationEmail(user.id, user.email);
+  // The website e-mails a verification link; the mobile app sends a 6-digit code instead.
+  if (opts.sendLinkEmail !== false) await sendVerificationEmail(user.id, user.email);
   await notify(user.id, {
     type: "ACCOUNT",
     title: "Welcome to AgriFlow AI",
@@ -224,6 +227,34 @@ export async function completeOnboarding(userId: string, role: Role, raw: Record
           serviceProvinces: d.serviceProvinces,
         };
         await tx.transporterProfile.upsert({ where: { userId }, create: { userId, ...p }, update: p });
+        await tx.user.update({ where: { id: userId }, data: { onboardingCompletedAt: new Date() } });
+      });
+      break;
+    }
+    case "EXPERT": {
+      const d = expertOnboardingSchema.parse(raw);
+      assertDistrict(d.province, d.district);
+      await prisma.$transaction(async (tx) => {
+        await saveBase(tx, userId, d);
+        const p = { organisation: d.organisation, qualification: d.qualification, specialisations: d.specialisations };
+        await tx.expertProfile.upsert({ where: { userId }, create: { userId, ...p }, update: p });
+        await tx.user.update({ where: { id: userId }, data: { onboardingCompletedAt: new Date() } });
+      });
+      break;
+    }
+    case "DISTRIBUTOR": {
+      const d = distributorOnboardingSchema.parse(raw);
+      assertDistrict(d.province, d.district);
+      await prisma.$transaction(async (tx) => {
+        await saveBase(tx, userId, d);
+        const sp = { businessName: d.businessName, registrationNumber: d.registrationNumber, description: d.description, categories: d.categories };
+        await tx.supplierProfile.upsert({ where: { userId }, create: { userId, ...sp }, update: sp });
+        const tp = {
+          businessName: d.businessName,
+          contactPhone: d.contactPhone ? normalisePhone(d.contactPhone) : null,
+          serviceProvinces: d.serviceProvinces,
+        };
+        await tx.transporterProfile.upsert({ where: { userId }, create: { userId, ...tp }, update: tp });
         await tx.user.update({ where: { id: userId }, data: { onboardingCompletedAt: new Date() } });
       });
       break;

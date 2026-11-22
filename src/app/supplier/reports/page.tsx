@@ -12,7 +12,7 @@ import { supplierSales } from "@/server/suppliers/service";
 export const metadata: Metadata = { title: "Sales reports" };
 
 export default async function SupplierReportsPage() {
-  const user = await requirePageRole("SUPPLIER");
+  const user = await requirePageRole("SUPPLIER", "DISTRIBUTOR");
   const s = await supplierSales({ id: user.id, role: user.role });
   return (
     <>

@@ -38,7 +38,7 @@ export default async function OnboardingPage() {
         <p className="mt-1 text-sm text-navy-500">Only the essentials. You can add more detail later from your profile.</p>
         <Card className="mt-6 p-5 sm:p-6">
           <OnboardingForm
-            role={user.role as "FARMER" | "BUYER" | "SUPPLIER" | "TRANSPORTER"}
+            role={user.role as "FARMER" | "BUYER" | "SUPPLIER" | "TRANSPORTER" | "EXPERT" | "DISTRIBUTOR"}
             defaults={{ fullName: user.profile?.fullName ?? "", phone: user.phone ?? "", province: user.profile?.province ?? null, district: user.profile?.district ?? null }}
             crops={crops.map((c) => c.name)}
             categories={categories.map((c) => c.name)}

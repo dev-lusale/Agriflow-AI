@@ -8,7 +8,7 @@ import { audit } from "@/lib/audit";
 import { supplierProductSchema } from "@/lib/validation/schemas";
 
 function assertSupplier(actor: Actor) {
-  if (actor.role !== "SUPPLIER") throw forbidden("Only supplier accounts can manage products.");
+  if (actor.role !== "SUPPLIER" && actor.role !== "DISTRIBUTOR") throw forbidden("Only supplier and distributor accounts can manage products.");
 }
 
 const INV_CATEGORY_FOR_SLUG: Record<string, InventoryCategory> = {
@@ -149,7 +149,7 @@ export async function getProduct(id: string) {
 
 export async function listSuppliers() {
   return prisma.user.findMany({
-    where: { role: "SUPPLIER", status: "ACTIVE", supplierProfile: { isNot: null } },
+    where: { role: { in: ["SUPPLIER", "DISTRIBUTOR"] }, status: "ACTIVE", supplierProfile: { isNot: null } },
     select: {
       id: true,
       verifiedAt: true,

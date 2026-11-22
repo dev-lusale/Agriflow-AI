@@ -13,7 +13,7 @@ import { setVehicleActiveAction } from "@/server/actions/ops";
 export const metadata: Metadata = { title: "Vehicles" };
 
 export default async function VehiclesPage() {
-  const user = await requirePageRole("TRANSPORTER");
+  const user = await requirePageRole("TRANSPORTER", "DISTRIBUTOR");
   const vehicles = await listVehicles({ id: user.id, role: user.role });
   return (
     <>

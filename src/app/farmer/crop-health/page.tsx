@@ -12,7 +12,7 @@ import { isAIConfigured } from "@/lib/env";
 import { prisma } from "@/lib/db";
 import { formatDateTime, cn } from "@/lib/utils";
 import { cropCatalog, farmOptions } from "@/server/farms/options";
-import { retryAssessmentAction } from "@/server/actions/ai";
+import { requestExpertReviewAction, retryAssessmentAction } from "@/server/actions/ai";
 import type { CropHealthResult } from "@/server/ai/prompts";
 
 export const metadata: Metadata = { title: "Crop health" };
@@ -172,6 +172,7 @@ function AssessmentView({ a }: { a: Awaited<ReturnType<typeof prisma.cropHealthA
                 </ul>
               </div>
             )}
+            <ExpertReviewBlock a={a} />
             <ListSection title="Suggested next steps" items={r.next_steps ?? []} ordered />
             <ListSection title="Prevention" items={r.prevention ?? []} />
             {r.safety_note && (
@@ -209,6 +210,31 @@ function ListSection({ title, items, ordered }: { title: string; items: string[]
           <li key={i}>{x}</li>
         ))}
       </L>
+    </div>
+  );
+}
+
+function ExpertReviewBlock({ a }: { a: { id: string; expertReviewStatus: "NONE" | "REQUESTED" | "ANSWERED"; expertNote: string | null; expertReviewedAt: Date | null } }) {
+  if (a.expertReviewStatus === "ANSWERED" && a.expertNote) {
+    return (
+      <div className="rounded-xl border border-forest-200 bg-forest-50 p-3 text-sm">
+        <p className="flex items-center gap-1.5 font-semibold text-forest-800">
+          <Stethoscope className="size-4" /> Expert second opinion
+        </p>
+        <p className="mt-1 whitespace-pre-line text-navy-800">{a.expertNote}</p>
+        {a.expertReviewedAt && <p className="mt-2 text-xs text-navy-500">Reviewed {formatDateTime(a.expertReviewedAt)} by a verified agricultural expert.</p>}
+      </div>
+    );
+  }
+  if (a.expertReviewStatus === "REQUESTED") {
+    return <p className="rounded-xl bg-sky-50 px-3 py-2 text-sm text-sky-800">Sent to verified experts for a second opinion. You will get a notification when one replies.</p>;
+  }
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3 text-sm">
+      <span className="text-navy-700">Want a human second opinion? Verified experts see the photo, crop and symptoms — not your name or contacts.</span>
+      <ActionButton variant="outline" action={async () => { "use server"; return requestExpertReviewAction(a.id); }}>
+        <Stethoscope /> Ask an expert
+      </ActionButton>
     </div>
   );
 }

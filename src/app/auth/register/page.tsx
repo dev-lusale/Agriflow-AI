@@ -15,7 +15,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
     <div>
       <h1 className="text-2xl font-bold">Create your account</h1>
       <p className="mt-1 text-sm text-navy-500">Free for farmers, buyers, suppliers and transporters.</p>
-      <RegisterForm defaultRole={["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER"].includes(role ?? "") ? role! : "FARMER"} />
+      <RegisterForm defaultRole={["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER", "EXPERT", "DISTRIBUTOR"].includes(role ?? "") ? role! : "FARMER"} />
       <p className="mt-6 text-center text-sm text-navy-600">
         Already registered?{" "}
         <Link href="/auth/login" className="font-semibold text-forest-700 hover:underline">

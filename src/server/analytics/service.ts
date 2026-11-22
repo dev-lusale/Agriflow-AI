@@ -29,6 +29,8 @@ export async function platformStats() {
     buyers: count("BUYER"),
     suppliers: count("SUPPLIER"),
     transporters: count("TRANSPORTER"),
+    experts: count("EXPERT"),
+    distributors: count("DISTRIBUTOR"),
     admins: count("ADMIN") + count("SUPER_ADMIN"),
     farms: farms.length,
     registeredHectares: hectares.toDecimalPlaces(1).toNumber(),

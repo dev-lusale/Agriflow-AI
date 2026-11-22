@@ -12,7 +12,7 @@ import { openRequests } from "@/server/logistics/service";
 export const metadata: Metadata = { title: "Delivery requests" };
 
 export default async function RequestsPage() {
-  const user = await requirePageRole("TRANSPORTER");
+  const user = await requirePageRole("TRANSPORTER", "DISTRIBUTOR");
   const requests = await openRequests({ id: user.id, role: user.role });
   return (
     <>

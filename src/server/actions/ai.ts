@@ -7,6 +7,7 @@ import { aiChatSchema, reportRequestSchema } from "@/lib/validation/schemas";
 import * as ai from "@/server/ai/service";
 import { saveImage } from "@/server/storage/service";
 import { invalid } from "@/lib/errors";
+import * as experts from "@/server/experts/service";
 
 export async function farmerChatAction(input: { conversationId?: string; message: string }) {
   return runAction(async () => {
@@ -63,6 +64,23 @@ export async function retryAssessmentAction(id: string) {
     await ai.retryAssessment(actor, id);
     revalidatePath("/farmer/crop-health");
   }, "Assessment re-run.");
+}
+
+export async function requestExpertReviewAction(id: string) {
+  return runAction(async () => {
+    const actor = await requireRole("FARMER");
+    const r = await experts.requestExpertReview(actor, id);
+    revalidatePath("/farmer/crop-health");
+    return r;
+  }, "Sent to verified experts.");
+}
+
+export async function submitExpertReviewAction(id: string, fd: FormData) {
+  return runAction(async () => {
+    const actor = await requireRole("EXPERT");
+    await experts.submitExpertReview(actor, id, { note: String(fd.get("note") ?? "") });
+    revalidatePath("/expert/dashboard");
+  }, "Review sent to the farmer.");
 }
 
 export async function cropAdviceAction(cropRecordId: string) {
