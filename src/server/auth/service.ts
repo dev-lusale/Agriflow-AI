@@ -25,6 +25,8 @@ const TOKEN_TTL: Record<TokenType, number> = {
   EMAIL_VERIFY: 48 * 3600_000,
   PASSWORD_RESET: 60 * 60_000,
   PHONE_OTP: 10 * 60_000,
+  EMAIL_OTP: 10 * 60_000,
+  RESET_OTP: 10 * 60_000,
 };
 
 export async function issueToken(userId: string, type: TokenType) {
