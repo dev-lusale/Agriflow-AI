@@ -82,6 +82,7 @@ The seed creates 30 farmers, 10 buyers, 5 suppliers, 5 transporters, 20 farms, 4
 | `npm run typecheck` · `npm run lint` | TypeScript · ESLint |
 | `npm test` | Unit + integration tests (uses the `agriflow_test` database) |
 | `npm run test:e2e` | Playwright workflows A–F, security and offline (needs a seeded DB and a running or built server) |
+| `npm run android:debug` / `android:release` | Build the Android app (see [docs/ANDROID.md](docs/ANDROID.md)) |
 
 ## Testing
 
@@ -95,9 +96,17 @@ E2E_BASE_URL=http://localhost:3000 npx playwright test tests/e2e/workflows.spec.
 npm run build && npx playwright test                                                 # starts next start on :3100
 ```
 
+## Continuous integration
+
+GitHub Actions runs on every push to `main` and `feat/**`:
+
+- **CI** (`.github/workflows/ci.yml`): typecheck, lint, Vitest (unit + integration on Postgres 16), migrate + seed, production build, Playwright. Summary + logs: [`ci-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/ci-latest).
+- **Android** (`.github/workflows/android.yml`): debug APK, release APK and AAB, then an Android 14 emulator smoke test. Files + screenshots: [`android-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/android-latest).
+
 ## Documentation
 
 - [docs/DEMO.md](docs/DEMO.md): the 4-minute judging demo script
+- [docs/ANDROID.md](docs/ANDROID.md): Android app, downloads, emulator test and release signing
 - [docs/API.md](docs/API.md): route handlers, server actions and data contracts
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): Vercel + Supabase deployment
 - [docs/SECURITY.md](docs/SECURITY.md): security and privacy design

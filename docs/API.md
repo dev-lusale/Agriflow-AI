@@ -20,6 +20,7 @@ AgriFlow uses **Next.js server actions** for mutations from the UI and **route h
 | Method & path | Auth | Purpose |
 |---|---|---|
 | `GET /api/health` | public | Deployment check: `{status, database, ai, aiModel, weatherProvider, storage, email, demoMode}`. No secrets |
+| `GET /api/ai/diagnostics[?vision=1]` | admin | Live Grok self-test: small text (and optional image) call to xAI. Returns `{keyConfigured, textModel, visionModel, text, vision, last24h, verdict, advice}`. Never returns the key; errors are redacted. Rate limited to 6 runs / 10 min per admin. Also available as "Test Grok connection" on Admin → AI |
 | `GET /api/uploads/:id` | public files: anyone; private: owner, admin, or delivery parties | Serves an image. Private files are sent `Cache-Control: private, no-store` |
 | `POST /api/sync` | farmer | Offline queue. Body `{ ops: [{ opId, kind, payload }] }` (max 50). `kind` ∈ `activity.create`, `note.create`, `note.update`, `task.create`, `task.complete`. Returns `{ results: [{opId, status: "synced"\|"conflict"\|"failed", …}] }`. Idempotent by `opId` |
 | `GET /api/me/farm-options` | farmer | Farm, field and crop names for offline forms |
