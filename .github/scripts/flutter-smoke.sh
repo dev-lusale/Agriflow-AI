@@ -68,8 +68,8 @@ tap "Log In"; sleep 2; shot 03-login-validation
 check "Empty login shows validation messages" "has 'Enter your email address'"
 
 # Social button is honest about missing OAuth
-scroll_to "Sign up" >/dev/null; tap "Log in with Google"; sleep 1; shot 04-social
-check "Google button says it is not set up" "has_now 'not set up yet'"
+scroll_to "Sign up" >/dev/null; tap "Log in with Google"; sleep 1
+check "Google button says it is not set up" "has_now 'not set up yet'"; shot 04-social
 
 # Real server call with a wrong password (no account is created or changed)
 sleep 4  # let the snackbar go
