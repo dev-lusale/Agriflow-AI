@@ -41,6 +41,24 @@ jobs:
           curl -fsSL -o mobile_app_gen/assets/fonts/PlusJakartaSans-VariableFont_wght.ttf "$base/PlusJakartaSans%5Bwght%5D.ttf"
           curl -fsSL -o mobile_app_gen/assets/fonts/OFL.txt "$base/OFL.txt"
           ls -la mobile_app_gen/assets/fonts
+      - name: Package API references (README, CHANGELOG, lib/) of key packages
+        run: |
+          set -eux
+          mkdir -p api-refs
+          cd mobile_app_gen
+          dart pub deps --style=list --no-dev > ../api-refs/deps.txt || true
+          PUB="${PUB_CACHE:-$HOME/.pub-cache}/hosted/pub.dev"
+          for p in material_ui flutter_riverpod riverpod go_router dio hive_ce hive_ce_flutter flutter_secure_storage connectivity_plus image_picker geolocator fl_chart flutter_markdown_plus speech_to_text share_plus firebase_messaging firebase_core cached_network_image; do
+            d=$(ls -d "$PUB"/$p-* 2>/dev/null | sort -V | tail -1) || true
+            [ -n "$d" ] || continue
+            mkdir -p ../api-refs/$p
+            cp "$d"/README.md "$d"/CHANGELOG.md ../api-refs/$p/ 2>/dev/null || true
+            cp -r "$d"/lib ../api-refs/$p/lib
+          done
+          # Flutter SDK framework sources for widgets/material (for API checks)
+          FL=$(dirname $(dirname $(which flutter)))
+          mkdir -p ../api-refs/flutter_sdk && cp -r "$FL/packages/flutter/lib" ../api-refs/flutter_sdk/lib
+          cd .. && zip -qr api-refs.zip api-refs && ls -la api-refs.zip
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -48,4 +66,4 @@ jobs:
           cd mobile_app_gen && rm -rf build .dart_tool && cd ..
           zip -qr flutter-bootstrap.zip mobile_app_gen
           gh release delete flutter-bootstrap --cleanup-tag -y 2>/dev/null || true
-          gh release create flutter-bootstrap flutter-bootstrap.zip flutter-version.txt --prerelease --target "${{ github.sha }}" --title "Flutter bootstrap" --notes "Generated Flutter project + resolved packages."
+          gh release create flutter-bootstrap flutter-bootstrap.zip flutter-version.txt api-refs.zip --prerelease --target "${{ github.sha }}" --title "Flutter bootstrap" --notes "Generated Flutter project + resolved packages."
