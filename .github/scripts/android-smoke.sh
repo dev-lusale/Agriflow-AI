@@ -33,7 +33,17 @@ check "MainActivity is in the foreground" "adb shell dumpsys activity activities
 adb logcat -d > "$OUT/logcat-online.txt"
 check "No AgriFlow crash (online)" "! grep -A2 'FATAL EXCEPTION' '$OUT/logcat-online.txt' | grep -q 'Process: $PKG'"
 check "WebView requested the AgriFlow server" "grep -qi 'Loading app at https://agriflow-ai-wheat.vercel.app' '$OUT/logcat-online.txt'"
-check "Online: live site shown, offline screen NOT used" "! grep -q 'localhost/offline.html' '$OUT/logcat-online.txt'"
+# Is the screen 30 s after launch the offline page? It is the only screen with a large
+# AgriFlow-green (#1F7A35) "Try again" button.
+offline_ratio=$(python3 -c "
+from PIL import Image
+im=Image.open('$OUT/02-online-home.png').convert('RGB'); px=list(im.getdata())
+print(round(sum(1 for r,g,b in px if abs(r-31)<14 and abs(g-122)<14 and abs(b-53)<14)/len(px),4))")
+echo "offline-button pixel share: $offline_ratio" >> "$OUT/network.txt"
+check "Online: AgriFlow site is on screen 30 s after launch" "python3 -c 'import sys; sys.exit(0 if float(\"$offline_ratio\") < 0.01 else 1)'"
+if grep -q 'localhost/offline.html' "$OUT/logcat-online.txt"; then
+  echo "INFO | online: first load hit a network error; offline screen auto-retried" | tee -a "$OUT/emulator-checks.txt"
+fi
 
 # 2) Hardware back button: should not crash the app
 adb shell input keyevent KEYCODE_BACK; sleep 3

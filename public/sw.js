@@ -5,7 +5,7 @@
  * - Authenticated pages and all /api requests are NEVER cached (private data stays off-device caches);
  *   when offline they fall back to the /offline page, which works from IndexedDB drafts.
  */
-const VERSION = "agriflow-v3";
+const VERSION = "agriflow-v4";
 const SHELL = `${VERSION}-shell`;
 const STATIC = `${VERSION}-static`;
 const PUBLIC_PAGES = ["/", "/about", "/how-it-works", "/features", "/farmers", "/marketplace", "/suppliers", "/logistics", "/contact", "/faq", "/privacy", "/terms"];
@@ -70,7 +70,9 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         const cache = await caches.open(STATIC);
         // Look in every AgriFlow cache: the shell precache also holds icons and brand images.
-        const hit = (await cache.match(req)) || (await caches.match(req));
+        // ignoreVary: /_next/image responses vary on Accept, and the <img> request's Accept
+        // header differs from the one used when precaching. Content is the same public artwork.
+        const hit = (await cache.match(req, { ignoreVary: true })) || (await caches.match(req, { ignoreVary: true }));
         if (hit) return hit;
         try {
           const res = await fetch(req);
