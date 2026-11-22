@@ -1,0 +1,51 @@
+name: Flutter bootstrap (one-time)
+
+# Generates the standard Flutter Android project and resolves current package versions,
+# then publishes them as the "flutter-bootstrap" release so they can be committed.
+on:
+  push:
+    branches: ["feat/flutter-bootstrap"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Create project and add packages
+        run: |
+          set -eux
+          flutter --version | tee flutter-version.txt
+          flutter create --project-name agriflow_ai --org zm.agriflow --platforms android --android-language kotlin mobile_app_gen
+          cd mobile_app_gen
+          flutter pub add flutter_riverpod go_router dio flutter_secure_storage shared_preferences hive_ce hive_ce_flutter \
+            image_picker geolocator connectivity_plus intl fl_chart url_launcher share_plus path_provider \
+            font_awesome_flutter flutter_markdown_plus speech_to_text firebase_core firebase_messaging \
+            cached_network_image package_info_plus
+          flutter pub add --dev flutter_launcher_icons flutter_native_splash mocktail
+          flutter pub get
+          cp ../flutter-version.txt .
+      - name: Fetch Plus Jakarta Sans (OFL licence)
+        run: |
+          set -eux
+          mkdir -p mobile_app_gen/assets/fonts
+          base=https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans
+          curl -fsSL -o mobile_app_gen/assets/fonts/PlusJakartaSans-VariableFont_wght.ttf "$base/PlusJakartaSans%5Bwght%5D.ttf"
+          curl -fsSL -o mobile_app_gen/assets/fonts/OFL.txt "$base/OFL.txt"
+          ls -la mobile_app_gen/assets/fonts
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd mobile_app_gen && rm -rf build .dart_tool && cd ..
+          zip -qr flutter-bootstrap.zip mobile_app_gen
+          gh release delete flutter-bootstrap --cleanup-tag -y 2>/dev/null || true
+          gh release create flutter-bootstrap flutter-bootstrap.zip flutter-version.txt --prerelease --target "${{ github.sha }}" --title "Flutter bootstrap" --notes "Generated Flutter project + resolved packages."
