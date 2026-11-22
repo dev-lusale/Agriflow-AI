@@ -12,6 +12,13 @@ check() { if eval "$2"; then echo "PASS | $1" | tee -a "$OUT/emulator-checks.txt
 adb wait-for-device
 adb shell getprop ro.build.version.release > "$OUT/device-android-version.txt"
 adb shell dumpsys package com.google.android.webview | grep -m1 versionName > "$OUT/device-webview-version.txt" || true
+# Wait until the emulator can actually reach the internet (fresh emulators take a while)
+net=no
+for i in $(seq 1 60); do
+  if adb shell ping -c 1 -W 2 agriflow-ai-wheat.vercel.app > /dev/null 2>&1; then net=yes; break; fi
+  sleep 3
+done
+echo "emulator network ready: $net" | tee "$OUT/network.txt"
 adb logcat -c
 
 check "APK installs" "adb install -r -g '$APK' > '$OUT/install.log' 2>&1"
@@ -25,7 +32,8 @@ check "App process is running" "adb shell pidof '$PKG' > /dev/null"
 check "MainActivity is in the foreground" "adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -q '$PKG'"
 adb logcat -d > "$OUT/logcat-online.txt"
 check "No fatal crash in logcat" "! grep -q 'FATAL EXCEPTION' '$OUT/logcat-online.txt'"
-check "WebView loaded the AgriFlow server" "grep -qi 'agriflow-ai-wheat.vercel.app' '$OUT/logcat-online.txt'"
+check "WebView requested the AgriFlow server" "grep -qi 'Loading app at https://agriflow-ai-wheat.vercel.app' '$OUT/logcat-online.txt'"
+check "Online: live site shown, offline screen NOT used" "! grep -q 'localhost/offline.html' '$OUT/logcat-online.txt'"
 
 # 2) Hardware back button: should not crash the app
 adb shell input keyevent KEYCODE_BACK; sleep 3
@@ -41,7 +49,7 @@ adb shell am start -W -n "$PKG/.MainActivity" > "$OUT/launch-offline.log" 2>&1
 sleep 15; adb exec-out screencap -p > "$OUT/04-offline.png"
 adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 && adb pull /sdcard/ui.xml "$OUT/ui-offline.xml" > /dev/null 2>&1
 adb logcat -d > "$OUT/logcat-offline.txt"
-check "Offline screen shown when there is no connection" "grep -qi \"offline\" '$OUT/ui-offline.xml'"
+check "Offline: bundled offline screen is shown" "grep -q 'localhost/offline.html' '$OUT/logcat-offline.txt'"
 check "No fatal crash offline" "! grep -q 'FATAL EXCEPTION' '$OUT/logcat-offline.txt'"
 adb shell svc wifi enable; adb shell svc data enable
 
