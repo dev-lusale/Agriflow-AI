@@ -34,9 +34,11 @@
 
     <!-- Minimal permissions, each tied to a real feature:
          INTERNET  - load the AgriFlow platform
+         NETWORK_STATE - tell the app when the phone goes offline/online (no prompt)
          CAMERA    - take crop photos for the AI crop-health check (asked only when used)
          LOCATION  - "Use my location" when mapping a farm field (asked only when used) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
