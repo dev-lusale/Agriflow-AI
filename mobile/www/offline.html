@@ -42,6 +42,11 @@
   }
   document.getElementById("retry").addEventListener("click", go);
   window.addEventListener("online", go);
+  // A brief network blip at launch should not strand the user here: retry a few times
+  // automatically while the phone reports a connection (3 s, 10 s, 30 s).
+  [3000, 10000, 30000].forEach(function (ms) {
+    setTimeout(function () { if (navigator.onLine) go(); }, ms);
+  });
 </script>
 </body>
 </html>
