@@ -2,7 +2,7 @@
   "name": "agriflow-ai-zambia",
   "version": "1.0.0",
   "private": true,
-  "description": "AgriFlow AI Zambia — AI-powered agricultural ecosystem (farm management, Grok AI, marketplace, logistics, finance).",
+  "description": "AgriFlow AI Zambia \u2014 AI-powered agricultural ecosystem (farm management, Grok AI, marketplace, logistics, finance).",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -21,12 +21,19 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "postinstall": "prisma generate",
     "db:bootstrap": "tsx prisma/bootstrap.ts",
-    "icons": "node scripts/generate-icons.mjs"
+    "icons": "node scripts/generate-icons.mjs",
+    "cap:sync": "cap sync android",
+    "android:debug": "cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "cap sync android && cd android && ./gradlew assembleRelease bundleRelease"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "6.19.3",
     "bcryptjs": "^3.0.3",
@@ -49,6 +56,9 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
     "@eslint/eslintrc": "^3.3.1",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4.1.16",

@@ -5,10 +5,21 @@
  * - Authenticated pages and all /api requests are NEVER cached (private data stays off-device caches);
  *   when offline they fall back to the /offline page, which works from IndexedDB drafts.
  */
-const VERSION = "agriflow-v2";
+const VERSION = "agriflow-v3";
 const SHELL = `${VERSION}-shell`;
 const STATIC = `${VERSION}-static`;
 const PUBLIC_PAGES = ["/", "/about", "/how-it-works", "/features", "/farmers", "/marketplace", "/suppliers", "/logistics", "/contact", "/faq", "/privacy", "/terms"];
+
+/** Only the app's own public artwork may be cached — never user uploads. */
+function isPublicImage(url) {
+  const PUBLIC = ["/brand/", "/images/", "/icons/"];
+  if (PUBLIC.some((p) => url.pathname.startsWith(p))) return true;
+  if (url.pathname === "/_next/image") {
+    const src = url.searchParams.get("url") || "";
+    return PUBLIC.some((p) => src.startsWith(p));
+  }
+  return false;
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -20,10 +31,15 @@ self.addEventListener("install", (event) => {
           const html = await res.clone().text();
           await cache.put("/offline", res);
           const assets = [...new Set(html.match(/\/_next\/static\/[^"'\s)]+/g) || [])];
+          // Optimised versions of public brand images used by the offline screen (logo etc.)
+          for (const m of html.match(/\/_next\/image\?url=[^"'\s)]+/g) || []) {
+            const u = m.replace(/&amp;/g, "&");
+            if (isPublicImage(new URL(u, self.location.origin))) assets.push(u);
+          }
           const staticCache = await caches.open(STATIC);
           await Promise.all(assets.map((a) => staticCache.add(a).catch(() => null)));
         }
-        await cache.addAll(["/icon.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.ico"]).catch(() => null);
+        await cache.addAll(["/icon.svg", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.ico", "/brand/agriflow-mark.png", "/brand/agriflow-logo.png"]).catch(() => null);
       } catch (e) {
         /* offline during install — will retry next time */
       }
@@ -49,15 +65,20 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return; // never cache API responses
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname === "/icon.svg") {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname === "/icon.svg" || isPublicImage(url)) {
     event.respondWith(
       (async () => {
         const cache = await caches.open(STATIC);
-        const hit = await cache.match(req);
+        // Look in every AgriFlow cache: the shell precache also holds icons and brand images.
+        const hit = (await cache.match(req)) || (await caches.match(req));
         if (hit) return hit;
-        const res = await fetch(req);
-        if (res.ok) cache.put(req, res.clone());
-        return res;
+        try {
+          const res = await fetch(req);
+          if (res.ok) cache.put(req, res.clone());
+          return res;
+        } catch {
+          return new Response("", { status: 504, statusText: "Offline" });
+        }
       })(),
     );
     return;
