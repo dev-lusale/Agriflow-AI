@@ -96,6 +96,7 @@ jobs:
       - name: Collect artifacts
         if: always()
         run: |
+          set +e
           mkdir -p dist android-results
           [ -f android-results/gradle-build.log ] && tail -120 android-results/gradle-build.log > android-results/gradle-tail.log || true
           cp android/app/build/outputs/apk/debug/app-debug.apk dist/AgriFlowAI-${AGRIFLOW_VERSION_NAME}-debug.apk 2>/dev/null || true
@@ -128,6 +129,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set +e
           gh release delete android-latest --cleanup-tag -y 2>/dev/null || true
           shopt -s nullglob
           files=(dist/* android-results/*.png android-results/SUMMARY.md)

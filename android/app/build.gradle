@@ -7,7 +7,7 @@ android {
         applicationId "zm.agriflow.ai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (System.getenv("AGRIFLOW_VERSION_CODE") ?: "1").toInteger()
+        versionCode Integer.parseInt(System.getenv("AGRIFLOW_VERSION_CODE") ?: "1")
         versionName System.getenv("AGRIFLOW_VERSION_NAME") ?: "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
