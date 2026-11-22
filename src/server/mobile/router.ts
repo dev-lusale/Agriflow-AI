@@ -2,6 +2,8 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { AppError } from "@/lib/errors";
 import { readUpload } from "@/server/storage/service";
+import { prisma } from "@/lib/db";
+import { DISTRICTS, PROVINCES } from "@/lib/zambia";
 import { authenticateRequest, errorResponse, Res, toJson, type Ctx, type RouteDef } from "./http";
 import { authRoutes } from "./routes/auth";
 import { meRoutes } from "./routes/me";
@@ -35,6 +37,21 @@ export const ROUTES: RouteDef[] = [
   ...adminRoutes,
   uploadRoute,
   { method: "GET", path: "/health", auth: false, handler: async () => ({ ok: true, api: "v1" }) },
+  {
+    method: "GET",
+    path: "/meta/regions",
+    auth: false,
+    handler: async () => ({
+      country: { code: "ZM", name: "Zambia" },
+      provinces: PROVINCES.map((p) => ({ value: p.value, label: p.label, districts: DISTRICTS[p.value].map((d) => d.name) })),
+    }),
+  },
+  {
+    method: "GET",
+    path: "/meta/product-categories",
+    auth: true,
+    handler: async () => prisma.productCategory.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true, slug: true, requiresSafetyInfo: true } }),
+  },
 ];
 
 type Compiled = RouteDef & { re: RegExp; keys: string[] };

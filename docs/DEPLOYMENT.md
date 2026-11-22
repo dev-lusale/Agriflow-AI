@@ -67,3 +67,4 @@ git push -u origin main
 
 - Development: `npm run db:migrate -- --name <change>` creates a new migration.
 - Production and CI: `npm run db:deploy` applies the pending ones. Never use `migrate dev` or `db:reset` on production.
+- **Automatic on Vercel production builds:** `vercel.json` runs `scripts/vercel-build.mjs`, which runs `prisma migrate deploy` (using `DIRECT_URL`) before `npm run build` when `VERCEL_ENV=production`. Preview builds never touch the database. Review every new migration in its pull request: anything destructive must be split into safe, additive steps.

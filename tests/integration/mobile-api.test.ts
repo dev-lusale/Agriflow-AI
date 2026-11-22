@@ -219,7 +219,7 @@ describe("mobile API authorisation and data isolation", () => {
     for (const r of ROUTES) expect(r.auth === false || r.auth === true || Array.isArray(r.auth)).toBe(true);
     const publicPaths = ROUTES.filter((r) => r.auth === false).map((r) => `${r.method} ${r.path}`).sort();
     expect(publicPaths).toEqual(
-      ["GET /auth/config", "GET /health", "POST /auth/forgot-password", "POST /auth/login", "POST /auth/logout", "POST /auth/refresh", "POST /auth/register", "POST /auth/reset-password"].sort(),
+      ["GET /auth/config", "GET /health", "GET /meta/regions", "POST /auth/forgot-password", "POST /auth/login", "POST /auth/logout", "POST /auth/refresh", "POST /auth/register", "POST /auth/reset-password"].sort(),
     );
   });
 });
