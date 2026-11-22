@@ -106,7 +106,8 @@ void main() {
     await t.enterText(find.byType(TextFormField).at(3), 'short');
     await t.enterText(find.byType(TextFormField).at(4), 'different');
     // Scroll the form to the bottom, where the Register button lives.
-    await t.drag(find.byType(SingleChildScrollView).first, const Offset(0, -4000));
+    final form = find.descendant(of: find.byType(SingleChildScrollView), matching: find.byType(Scrollable)).first;
+    await t.scrollUntilVisible(find.text('Register'), 300, scrollable: form);
     await t.pumpAndSettle();
     await t.tap(find.text('Register'));
     await t.pumpAndSettle();

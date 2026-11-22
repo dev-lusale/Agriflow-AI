@@ -25,8 +25,11 @@ pick = next((n for n, ls in nodes if want in ls), None) or next((n for n, ls in 
 if pick is not None:
     x1, y1, x2, y2 = map(int, re.findall(r'\d+', pick.get('bounds')))
     print((x1 + x2) // 2, (y1 + y2) // 2)
+    print('#', pick.get('class'), repr(pick.get('content-desc')), pick.get('bounds'), file=sys.stderr)
 PY
 )
+  TAPN=$((${TAPN:-0}+1)); cp "$OUT/_tap.xml" "$OUT/tap-$TAPN.xml" 2>/dev/null
+  echo "tap $TAPN '$1' -> ${b:-NOT FOUND}" >> "$OUT/taps.log"
   [ -n "$b" ] && adb shell input tap $b && return 0
   return 1
 }
