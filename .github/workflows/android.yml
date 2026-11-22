@@ -3,7 +3,6 @@ name: Android
 on:
   push:
     branches: [main, "feat/**"]
-    paths: ["android/**", "mobile/**", "capacitor.config.ts", "package.json", "package-lock.json", ".github/workflows/android.yml", ".github/scripts/android-smoke.sh"]
   workflow_dispatch:
 
 permissions:
