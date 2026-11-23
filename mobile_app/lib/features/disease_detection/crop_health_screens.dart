@@ -148,7 +148,7 @@ class _CropHealthNewScreenState extends ConsumerState<CropHealthNewScreen> {
           PrimaryButton(label: 'Get advice', icon: Icons.healing_outlined, loading: _busy, onPressed: _submit),
           const SizedBox(height: 12),
           const Text(
-            'AgriFlow AI (Grok vision) gives an AI-assisted assessment, not a laboratory diagnosis. For serious or spreading problems, ask a verified expert or your extension officer.',
+            'AgriFlow AI gives an AI-assisted assessment, not a laboratory diagnosis. For serious or spreading problems, ask a verified expert or your extension officer.',
             style: TextStyle(color: AppColors.muted, fontSize: 12.5, height: 1.4),
           ),
         ]),
@@ -214,7 +214,7 @@ class CropHealthResultScreen extends ConsumerWidget {
               ]),
             if (status != 'COMPLETED') ...[
               const SizedBox(height: 8),
-              Text(r.s('error', 'Grok could not assess this case right now. Your photo and description are saved.'), style: const TextStyle(color: AppColors.muted)),
+              Text(r.s('error', 'AgriFlow AI could not assess this case right now. Your photo and description are saved.'), style: const TextStyle(color: AppColors.muted)),
               const SizedBox(height: 12),
               SecondaryButton(
                 label: 'Try the AI check again',
@@ -267,7 +267,7 @@ class CropHealthResultScreen extends ConsumerWidget {
               const SectionHeader('Second opinion'),
               _ExpertBlock(a: a, onRequested: () => ref.invalidate(assessmentProvider(id))),
               const SizedBox(height: 14),
-              Text('AI-assisted assessment by ${a.s('model', 'Grok')} on ${dateTimeFmt(a.d('createdAt'))}. Not a definitive diagnosis. Use only products registered for this crop in Zambia and follow the label.',
+              Text('AI-assisted assessment by AgriFlow AI on ${dateTimeFmt(a.d('createdAt'))}. Not a definitive diagnosis. Use only products registered for this crop in Zambia and follow the label.',
                   style: const TextStyle(fontSize: 12, color: AppColors.muted)),
             ],
           ];

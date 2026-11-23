@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             const Text(
-              'Farm records, Grok-powered advice, crop health checks, local weather and a marketplace built for Zambian farmers and agribusinesses.',
+              'Farm records, AI-powered advice, crop health checks, local weather and a marketplace built for Zambian farmers and agribusinesses.',
               style: TextStyle(fontFamily: kFont, fontSize: 16, color: AppColors.muted, height: 1.5),
             ),
             const Spacer(flex: 3),

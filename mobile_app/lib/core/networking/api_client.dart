@@ -44,7 +44,7 @@ class ApiClient {
         baseUrl: Env.apiRoot,
         connectTimeout: const Duration(seconds: 15),
         sendTimeout: const Duration(seconds: 60),
-        receiveTimeout: const Duration(seconds: 75), // Grok answers can take a while
+        receiveTimeout: const Duration(seconds: 75), // AI answers can take a while
         headers: {'Accept': 'application/json'},
       );
 

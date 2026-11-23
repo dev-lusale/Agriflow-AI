@@ -1,5 +1,5 @@
 /// Build-time configuration (pass with --dart-define). No secrets live in the app:
-/// Grok, database and e-mail credentials stay on the AgriFlow server.
+/// AI, database and e-mail credentials stay on the AgriFlow server.
 class Env {
   static const apiBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://agriflow-ai-wheat.vercel.app');
   static const websiteUrl = String.fromEnvironment('WEBSITE_URL', defaultValue: 'https://agriflow-ai-wheat.vercel.app');

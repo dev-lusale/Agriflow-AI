@@ -236,7 +236,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final configured = ref.watch(aiStatusProvider).value;
     return Scaffold(
       appBar: AppBar(
         title: const Row(children: [AppLogo(height: 28), SizedBox(width: 10), Text('AgriFlow AI')]),
@@ -246,13 +245,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
         ],
       ),
       body: Column(children: [
-        if (configured == false)
-          Container(
-            width: double.infinity,
-            color: AppColors.amberSoft,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: const Text('Grok is not connected on the server yet. Answers will come from AgriFlow\'s built-in guidance and are labelled.', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
-          ),
         if (_fromCache) const Padding(padding: EdgeInsets.fromLTRB(16, 8, 16, 0), child: Text('Saved copy of this conversation (offline).', style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w700))),
         Expanded(
           child: _loadingHistory
@@ -325,7 +317,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ),
         const SizedBox(height: 6),
         Row(children: [
-          Pill(mode == 'grok' ? 'Grok' : 'Built-in guidance', color: mode == 'grok' ? AppColors.coralSoft : AppColors.amberSoft, icon: mode == 'grok' ? Icons.auto_awesome : Icons.menu_book_outlined),
+          Pill(mode == 'grok' ? 'AgriFlow AI' : 'Built-in guidance', color: mode == 'grok' ? AppColors.coralSoft : AppColors.amberSoft, icon: mode == 'grok' ? Icons.auto_awesome : Icons.menu_book_outlined),
           if (m.meta.b('used_farm_data')) const Padding(padding: EdgeInsets.only(left: 6), child: Pill('Used your farm records', icon: Icons.agriculture_outlined)),
           const Spacer(),
           IconButton(
@@ -339,7 +331,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           ),
           if (isLast) IconButton(tooltip: 'Regenerate', visualDensity: VisualDensity.compact, icon: const Icon(Icons.refresh, size: 18), onPressed: _sending ? null : _regenerate),
         ]),
-        if (mode != 'grok' && m.meta.sn('notice') != null) Text(m.meta.s('notice'), style: const TextStyle(fontSize: 12, color: AppColors.muted)),
       ]),
     );
   }
@@ -462,7 +453,7 @@ class _TypingState extends State<_Typing> with SingleTickerProviderStateMixin {
       );
 }
 
-/// Grok advice for one crop record ("Ask AgriFlow AI about this crop").
+/// AI advice for one crop record ("Ask AgriFlow AI about this crop").
 final cropAdviceProvider = FutureProvider.family<Json, String>((ref, id) async => asJson(await ref.watch(apiClientProvider).post('/crop-records/$id/advice')));
 
 class CropAdviceScreen extends ConsumerWidget {
@@ -481,7 +472,7 @@ class CropAdviceScreen extends ConsumerWidget {
         data: (r) {
           final a = r.mn('advice');
           if (a == null) {
-            return EmptyView(icon: Icons.cloud_off_outlined, title: 'Advice unavailable', message: r.s('notice', 'Grok is not available right now.'), actionLabel: 'Try again', onAction: () => ref.invalidate(cropAdviceProvider(cropRecordId)));
+            return EmptyView(icon: Icons.cloud_off_outlined, title: 'Advice unavailable', message: r.s('notice', 'AI advice is not available right now.'), actionLabel: 'Try again', onAction: () => ref.invalidate(cropAdviceProvider(cropRecordId)));
           }
           return ListView(padding: const EdgeInsets.all(20), children: [
             AppCard(child: Text(a.s('summary'), style: const TextStyle(fontSize: 15.5, height: 1.45))),
@@ -509,7 +500,7 @@ class CropAdviceScreen extends ConsumerWidget {
             ],
             if (a.sn('uncertainty_note') != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(a.s('uncertainty_note'), style: const TextStyle(color: AppColors.muted, fontSize: 13))),
             const SizedBox(height: 8),
-            const Text('AI-generated advice from Grok. Check product labels and ask your extension officer when unsure.', style: TextStyle(color: AppColors.muted, fontSize: 12)),
+            const Text('AI-generated advice. Check product labels and ask your extension officer when unsure.', style: TextStyle(color: AppColors.muted, fontSize: 12)),
           ]);
         },
       ),
