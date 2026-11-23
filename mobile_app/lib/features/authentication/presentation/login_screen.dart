@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   SquareIconButton(
                     semanticLabel: 'Log in with Google',
                     onTap: () => _social('Google', providers.b('google')),
-                    child: const Text('G', style: TextStyle(fontFamily: kFont, fontSize: 26, fontWeight: FontWeight.w800, color: AppColors.ink)),
+                    child: Image.asset('assets/brand/google-g.png', width: 26, height: 26, excludeFromSemantics: true),
                   ),
                   const SizedBox(width: 18),
                   SquareIconButton(
