@@ -13,7 +13,17 @@ import { issueTokenPair, revokeAllForUser, revokeByToken, rotateRefreshToken } f
 import { sendOtp, verifyOtp } from "../otp";
 import { loadMe } from "./me";
 
-const ip = (req: Request) => (req.headers.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
+/**
+ * Client IP for rate limits. Requests that come through the Cloudflare relay (used where mobile
+ * networks cannot reach Vercel directly) carry the phone's real IP plus a shared secret; without
+ * the secret the header is ignored, so it cannot be spoofed.
+ */
+const ip = (req: Request) => {
+  const secret = process.env.RELAY_SECRET;
+  const relayed = req.headers.get("x-agriflow-client-ip");
+  if (secret && relayed && req.headers.get("x-agriflow-relay-secret") === secret) return relayed.trim();
+  return (req.headers.get("x-forwarded-for") ?? "").split(",")[0]?.trim() || "unknown";
+};
 
 export const socialProviders = () => ({
   // OAuth sign-in is only offered once the owner configures each provider (see docs/MOBILE_APP.md).
