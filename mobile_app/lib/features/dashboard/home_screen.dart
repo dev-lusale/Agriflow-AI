@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../core/config/env.dart';
 import '../../core/providers/core_providers.dart';
 import '../../core/services/cache_store.dart';
 import '../../core/services/data.dart';
@@ -93,7 +92,7 @@ class HomeScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 26,
                   backgroundColor: AppColors.coralSoft,
-                  backgroundImage: avatar == null ? null : CachedNetworkImageProvider('${Env.apiBaseUrl}$avatar', headers: api.authHeaders),
+                  backgroundImage: avatar == null ? null : CachedNetworkImageProvider('${api.serverUrl}$avatar', headers: api.authHeaders),
                   child: avatar == null ? Text(initials(user.fullName), style: const TextStyle(fontFamily: kFont, fontWeight: FontWeight.w800, color: AppColors.ink)) : null,
                 ),
                 const SizedBox(width: 12),

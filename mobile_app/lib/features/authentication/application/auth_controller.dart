@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show AppLifecycleListener;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/networking/api_exception.dart';
@@ -26,10 +29,47 @@ final authControllerProvider = NotifierProvider<AuthController, AuthState>(AuthC
 class AuthController extends Notifier<AuthState> {
   static const _meCacheKey = 'me';
 
+  Timer? _reconnectTimer;
+  AppLifecycleListener? _lifecycle;
+
   @override
   AuthState build() {
+    ref.onDispose(() {
+      _reconnectTimer?.cancel();
+      _lifecycle?.dispose();
+    });
     Future.microtask(_restore);
     return const AuthState(AuthStatus.unknown);
+  }
+
+  /// While signed in from the saved profile, keep checking the server: every 30 seconds and
+  /// whenever the app comes back to the foreground. The first answer switches back to live data.
+  void _startReconnecting() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 30), (_) => tryReconnect());
+    _lifecycle ??= AppLifecycleListener(onResume: tryReconnect);
+  }
+
+  bool _reconnecting = false;
+
+  /// Returns true when the server answered and the app is live again.
+  Future<bool> tryReconnect() async {
+    if (!state.offline || _reconnecting) return !state.offline;
+    _reconnecting = true;
+    try {
+      await _signedIn(await _repo.me());
+      _reconnectTimer?.cancel();
+      return true;
+    } on ApiException catch (e) {
+      if (!e.isNetwork && e.isUnauthenticated) {
+        _reconnectTimer?.cancel();
+        await ref.read(tokenStoreProvider).clear();
+        state = const AuthState(AuthStatus.signedOut);
+      }
+      return false;
+    } finally {
+      _reconnecting = false;
+    }
   }
 
   AuthRepository get _repo => ref.read(authRepositoryProvider);
@@ -53,6 +93,7 @@ class AuthController extends Notifier<AuthState> {
         if (cached != null) {
           ref.read(syncQueueProvider).setScope(userId);
           state = AuthState(AuthStatus.signedIn, user: AppUser(asJson(cached.data)), offline: true);
+          _startReconnecting();
           return;
         }
       }

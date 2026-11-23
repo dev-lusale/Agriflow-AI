@@ -65,7 +65,16 @@ class _AppShellState extends ConsumerState<AppShell> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<bool>>(onlineProvider, (prev, next) {
-      if (next.value == true && prev?.value != true) _flush();
+      if (next.value == true && prev?.value != true) {
+        _flush();
+        ref.read(authControllerProvider.notifier).tryReconnect();
+      }
+    });
+    ref.listen(authControllerProvider.select((a) => a.offline), (was, now) {
+      if (was == true && now == false && mounted) {
+        _flush();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connected to AgriFlow again. Pull down on a screen to load the latest data.')));
+      }
     });
     final user = ref.watch(authControllerProvider).user;
     final online = ref.watch(onlineProvider).value ?? true;

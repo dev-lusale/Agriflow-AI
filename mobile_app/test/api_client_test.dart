@@ -108,4 +108,49 @@ void main() {
     await expectLater(client.post('/auth/login', {'email': 'x', 'password': 'y'}), throwsA(isA<ApiException>().having((e) => e.status, 'status', 401)));
     expect(refresh.calls, isEmpty);
   });
+
+  group('patchy networks', () {
+    const relay = 'https://relay.example/api/v1';
+    const direct = 'https://direct.example/api/v1';
+    DioException down(RequestOptions o) => DioException.connectionError(requestOptions: o, reason: 'no route');
+
+    test('retries a failed connection on the same address before giving up on it', () async {
+      var n = 0;
+      final api = FakeAdapter((o) => ++n < 3 ? throw down(o) : json(200, {'ok': true}));
+      final client = ApiClient(tokens, onSessionExpired: () {}, dio: Dio(BaseOptions(baseUrl: relay))..httpClientAdapter = api, servers: const [relay], retryDelays: const [Duration.zero, Duration.zero]);
+      expect(await client.get('/me'), {'ok': true});
+      expect(api.calls.length, 3);
+    });
+
+    test('switches to the other address when one cannot be reached, and keeps using it', () async {
+      final seen = <String>[];
+      final api = FakeAdapter((o) {
+        seen.add(o.baseUrl);
+        return o.baseUrl == relay ? throw down(o) : json(200, {'ok': true});
+      });
+      final dio = Dio(BaseOptions(baseUrl: relay))..httpClientAdapter = api;
+      final client = ApiClient(tokens, onSessionExpired: () {}, dio: dio, servers: const [relay, direct], retryDelays: const [Duration.zero]);
+      expect(await client.get('/dashboard'), {'ok': true});
+      expect(seen, [relay, relay, direct]);
+      expect(client.apiRoot, direct);
+      expect(client.serverUrl, 'https://direct.example');
+      seen.clear();
+      await client.get('/farms');
+      expect(seen, [direct]);
+    });
+
+    test('reports a network error only after every address failed', () async {
+      final api = FakeAdapter((o) => throw down(o));
+      final client = ApiClient(tokens, onSessionExpired: () {}, dio: Dio(BaseOptions(baseUrl: relay))..httpClientAdapter = api, servers: const [relay, direct], retryDelays: const [Duration.zero]);
+      await expectLater(client.get('/me'), throwsA(isA<ApiException>().having((e) => e.isNetwork, 'isNetwork', true)));
+      expect(api.calls.length, 4);
+    });
+
+    test('server errors are not retried', () async {
+      final api = FakeAdapter((o) => json(500, {'error': {'code': 'INTERNAL', 'message': 'boom'}}));
+      final client = ApiClient(tokens, onSessionExpired: () {}, dio: Dio(BaseOptions(baseUrl: relay))..httpClientAdapter = api, servers: const [relay, direct], retryDelays: const [Duration.zero]);
+      await expectLater(client.post('/farms', {'name': 'x'}), throwsA(isA<ApiException>()));
+      expect(api.calls.length, 1);
+    });
+  });
 }

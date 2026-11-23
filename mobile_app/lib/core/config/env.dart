@@ -21,4 +21,9 @@ class Env {
       firebaseApiKey.isNotEmpty && firebaseAppId.isNotEmpty && firebaseSenderId.isNotEmpty && firebaseProjectId.isNotEmpty;
 
   static String get apiRoot => '$apiBaseUrl/api/v1';
+
+  /// Every address the app may use for the API, in order of preference. When a relay address is
+  /// configured, the direct server is kept as a fallback (and vice versa the relay is preferred),
+  /// so the app works on networks that cannot reach one of them.
+  static List<String> get apiRoots => {apiRoot, '$_defaultServer/api/v1'}.toList();
 }

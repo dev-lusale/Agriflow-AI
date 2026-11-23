@@ -78,7 +78,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             CircleAvatar(
               radius: 48,
               backgroundColor: AppColors.coralSoft,
-              backgroundImage: u.avatarUrl == null ? null : CachedNetworkImageProvider('${Env.apiBaseUrl}${u.avatarUrl}', headers: api.authHeaders),
+              backgroundImage: u.avatarUrl == null ? null : CachedNetworkImageProvider('${api.serverUrl}${u.avatarUrl}', headers: api.authHeaders),
               child: u.avatarUrl == null ? Text(initials(u.fullName), style: const TextStyle(fontFamily: kFont, fontSize: 30, fontWeight: FontWeight.w800, color: AppColors.ink)) : null,
             ),
             Positioned(
