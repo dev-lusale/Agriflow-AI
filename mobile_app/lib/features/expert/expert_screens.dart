@@ -12,8 +12,8 @@ import '../../core/widgets/inputs.dart';
 import '../../core/widgets/states.dart';
 import '../marketplace/market_widgets.dart';
 
-final expertStatusProvider = FutureProvider<Json>((ref) async => asJson(await ref.watch(userApiProvider).get('/expert/status')));
-final expertCasesProvider = FutureProvider<Json>((ref) async => asJson(await ref.watch(userApiProvider).get('/expert/cases')));
+final expertStatusProvider = FutureProvider<Json>((ref) async => asJson(await userApi(ref).get('/expert/status')));
+final expertCasesProvider = FutureProvider<Json>((ref) async => asJson(await userApi(ref).get('/expert/cases')));
 
 class ExpertCasesScreen extends ConsumerWidget {
   const ExpertCasesScreen({super.key, this.embedded = false});

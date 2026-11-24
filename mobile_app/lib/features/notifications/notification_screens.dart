@@ -16,7 +16,7 @@ import '../../core/widgets/states.dart';
 import '../authentication/application/auth_controller.dart';
 
 final notificationsProvider = FutureProvider<Cached<dynamic>>((ref) => cachedGet(ref, '/notifications'));
-final preferencesProvider = FutureProvider<Json>((ref) async => asJson(await ref.watch(userApiProvider).get('/notification-preferences')));
+final preferencesProvider = FutureProvider<Json>((ref) async => asJson(await userApi(ref).get('/notification-preferences')));
 final conversationsListProvider = FutureProvider<Cached<dynamic>>((ref) => cachedGet(ref, '/conversations'));
 final conversationProvider = FutureProvider.family<Cached<dynamic>, String>((ref, id) => cachedGet(ref, '/conversations/$id'));
 

@@ -15,8 +15,8 @@ import '../../../models/app_user.dart';
 import '../application/auth_controller.dart';
 import 'auth_common.dart';
 
-final cropNamesProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await ref.watch(userApiProvider).get('/crops')));
-final productCategoriesProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await ref.watch(userApiProvider).get('/meta/product-categories')));
+final cropNamesProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await userApi(ref).get('/crops')));
+final productCategoriesProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await userApi(ref).get('/meta/product-categories')));
 
 /// Role-specific details the server needs before the account can be used (same as the website).
 class OnboardingScreen extends ConsumerStatefulWidget {

@@ -26,7 +26,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 });
 
 /// The account currently signed in on this phone (null when signed out).
-/// Every provider that holds a user's data depends on it (through [userApiProvider] or
+/// Every provider that holds a user's data depends on it (through [userApi] or
 /// [cachedGet]), so when one person signs out and another signs in, everything loaded for the
 /// previous account is discarded and reloaded for the new one.
 final sessionUserIdProvider = NotifierProvider<SessionUserId, String?>(SessionUserId.new);
@@ -39,12 +39,14 @@ class SessionUserId extends Notifier<String?> {
   }
 }
 
-/// The API client, tied to the signed-in account. Use this (not [apiClientProvider]) inside
-/// providers that load data, so the data belongs to whoever is signed in now.
-final userApiProvider = Provider<ApiClient>((ref) {
+/// The API client for a data provider, tied to the signed-in account: the provider reloads
+/// whenever a different person signs in (or out). Use this inside every provider that loads data.
+/// (Watching the account directly matters: the client object itself never changes, so
+/// depending on it alone would not trigger a reload.)
+ApiClient userApi(Ref ref) {
   ref.watch(sessionUserIdProvider);
   return ref.watch(apiClientProvider);
-});
+}
 
 /// true when the phone reports any network connection.
 final onlineProvider = StreamProvider<bool>((ref) async* {
