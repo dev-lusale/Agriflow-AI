@@ -18,9 +18,9 @@ import '../authentication/presentation/auth_common.dart';
 import '../farm_management/farm_providers.dart';
 
 final adminOverviewProvider = FutureProvider<Cached<dynamic>>((ref) => cachedGet(ref, '/admin/overview'));
-final adminUsersProvider = FutureProvider.family<Json, String>((ref, query) async => asJson(await ref.watch(apiClientProvider).get('/admin/users', query: Uri.splitQueryString(query))));
-final adminListingsProvider = FutureProvider.family<List<Json>, String>((ref, m) async => asJsonList(await ref.watch(apiClientProvider).get('/admin/listings', query: m.isEmpty ? null : {'moderation': m})));
-final adminReportsProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await ref.watch(apiClientProvider).get('/admin/reports')));
+final adminUsersProvider = FutureProvider.family<Json, String>((ref, query) async => asJson(await ref.watch(userApiProvider).get('/admin/users', query: Uri.splitQueryString(query))));
+final adminListingsProvider = FutureProvider.family<List<Json>, String>((ref, m) async => asJsonList(await ref.watch(userApiProvider).get('/admin/listings', query: m.isEmpty ? null : {'moderation': m})));
+final adminReportsProvider = FutureProvider<List<Json>>((ref) async => asJsonList(await ref.watch(userApiProvider).get('/admin/reports')));
 
 class AdminScreen extends ConsumerWidget {
   const AdminScreen({super.key, this.embedded = false});

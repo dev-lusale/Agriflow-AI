@@ -23,4 +23,4 @@ Future<Cached<dynamic>> fetchCached(ApiClient api, CacheStore cache, String path
 }
 
 Future<Cached<dynamic>> cachedGet(Ref ref, String path, {Map<String, dynamic>? query}) =>
-    fetchCached(ref.read(apiClientProvider), ref.read(cacheStoreProvider), path, query: query);
+    fetchCached(ref.watch(userApiProvider), ref.read(cacheStoreProvider), path, query: query);

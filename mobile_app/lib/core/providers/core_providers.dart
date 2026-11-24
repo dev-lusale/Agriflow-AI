@@ -25,6 +25,27 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   )..deviceName = 'AgriFlow AI Android';
 });
 
+/// The account currently signed in on this phone (null when signed out).
+/// Every provider that holds a user's data depends on it (through [userApiProvider] or
+/// [cachedGet]), so when one person signs out and another signs in, everything loaded for the
+/// previous account is discarded and reloaded for the new one.
+final sessionUserIdProvider = NotifierProvider<SessionUserId, String?>(SessionUserId.new);
+
+class SessionUserId extends Notifier<String?> {
+  @override
+  String? build() => null;
+  void set(String? id) {
+    if (state != id) state = id;
+  }
+}
+
+/// The API client, tied to the signed-in account. Use this (not [apiClientProvider]) inside
+/// providers that load data, so the data belongs to whoever is signed in now.
+final userApiProvider = Provider<ApiClient>((ref) {
+  ref.watch(sessionUserIdProvider);
+  return ref.watch(apiClientProvider);
+});
+
 /// true when the phone reports any network connection.
 final onlineProvider = StreamProvider<bool>((ref) async* {
   final c = Connectivity();

@@ -19,7 +19,7 @@ import '../../core/widgets/logo.dart';
 import '../../core/widgets/states.dart';
 import '../farm_management/farm_providers.dart';
 
-final aiStatusProvider = FutureProvider<bool>((ref) async => asJson(await ref.watch(apiClientProvider).get('/ai/status')).b('configured'));
+final aiStatusProvider = FutureProvider<bool>((ref) async => asJson(await ref.watch(userApiProvider).get('/ai/status')).b('configured'));
 final conversationsProvider = FutureProvider<Cached<dynamic>>((ref) => cachedGet(ref, '/ai/conversations'));
 
 const greeting = "Hello! I'm AgriFlow AI, your intelligent agricultural assistant. How can I help improve your farming today?";
@@ -454,7 +454,7 @@ class _TypingState extends State<_Typing> with SingleTickerProviderStateMixin {
 }
 
 /// AI advice for one crop record ("Ask AgriFlow AI about this crop").
-final cropAdviceProvider = FutureProvider.family<Json, String>((ref, id) async => asJson(await ref.watch(apiClientProvider).post('/crop-records/$id/advice')));
+final cropAdviceProvider = FutureProvider.family<Json, String>((ref, id) async => asJson(await ref.watch(userApiProvider).post('/crop-records/$id/advice')));
 
 class CropAdviceScreen extends ConsumerWidget {
   const CropAdviceScreen({super.key, required this.cropRecordId, this.title});

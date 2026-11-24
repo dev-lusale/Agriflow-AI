@@ -91,7 +91,7 @@ class AuthController extends Notifier<AuthState> {
         cache.setScope(userId);
         final cached = cache.get(_meCacheKey);
         if (cached != null) {
-          ref.read(syncQueueProvider).setScope(userId);
+          _scope(userId);
           state = AuthState(AuthStatus.signedIn, user: AppUser(asJson(cached.data)), offline: true);
           _startReconnecting();
           return;
@@ -110,6 +110,8 @@ class AuthController extends Notifier<AuthState> {
     userId == null ? prefs.remove(_kLastUser) : prefs.setString(_kLastUser, userId);
     ref.read(cacheStoreProvider).setScope(userId);
     ref.read(syncQueueProvider).setScope(userId);
+    // Discards everything loaded for any previous account on this phone.
+    ref.read(sessionUserIdProvider.notifier).set(userId);
   }
 
   Future<void> _signedIn(Json me) async {

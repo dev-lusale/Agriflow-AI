@@ -223,3 +223,75 @@ describe("mobile API authorisation and data isolation", () => {
     );
   });
 });
+
+describe("several people using AgriFlow (account isolation)", () => {
+  const PNG = Uint8Array.from(
+    atob(
+      "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAaElEQVR4Xu3RAQkAIQAEQTXXBzOYAeVTLMJMgjt27vONl62Xx/8cqClQU6CmQE2BmgI1BWoK1BSoKVBToKZATYGaAjUFagrUFKgpUFOgpkBNgZoCNQVqCtQUqClQU6CmQE2BmgI1BWoXHFwB6CFA34IAAAAASUVORK5CYII=",
+    ),
+    (c) => c.charCodeAt(0),
+  );
+  const person = (role: string, fullName: string, province: string, district: string) => ({ ...registration(role), fullName, province, district });
+
+  it("A registers, adds a photo and an AI chat, logs out; B registers and sees only B; A logs back in to A's own data", async () => {
+    // User A
+    const aReg = person("FARMER", "Alice Phiri", "SOUTHERN", "Choma");
+    const a = await call("/auth/register", { body: aReg });
+    expect(a.status).toBe(201);
+    const form = new FormData();
+    form.append("image", new File([PNG], "me.png", { type: "image/png" }));
+    const withPhoto = await call("/me/avatar", { token: a.json.accessToken, body: form });
+    expect(withPhoto.status).toBe(200);
+    const aAvatar = withPhoto.json.avatarUrl as string;
+    expect(aAvatar).toMatch(/^\/api\/v1\/uploads\//);
+    const chat = await call("/ai/chat", { token: a.json.accessToken, body: { message: "When should I plant maize in Choma?" } });
+    expect(chat.status).toBe(200);
+    await call("/auth/logout", { body: { refreshToken: a.json.refreshToken } });
+    expect((await call("/me", { token: a.json.accessToken })).status).toBe(401);
+
+    // User B on the same phone
+    const bReg = person("BUYER", "Bwalya Mulenga", "COPPERBELT", "Kitwe");
+    const b = await call("/auth/register", { body: bReg });
+    expect(b.status).toBe(201);
+    const bMe = (await call("/me", { token: b.json.accessToken })).json;
+    expect(bMe).toMatchObject({ email: bReg.email.toLowerCase(), role: "BUYER", avatarUrl: null });
+    expect(bMe.profile).toMatchObject({ fullName: "Bwalya Mulenga", province: "COPPERBELT", district: "Kitwe" });
+    const bDash = (await call("/dashboard", { token: b.json.accessToken })).json;
+    expect(bDash).toMatchObject({ greetingName: "Bwalya", role: "BUYER", avatarUrl: null, location: { province: "COPPERBELT", district: "Kitwe" } });
+    expect(JSON.stringify(bDash)).not.toContain("Alice");
+    expect(JSON.stringify(bDash)).not.toContain(aAvatar);
+    await call("/auth/logout", { body: { refreshToken: b.json.refreshToken } });
+
+    // User A again
+    const again = await call("/auth/login", { body: { email: aReg.email, password: aReg.password, deviceName: "Test phone" } });
+    expect(again.status).toBe(200);
+    const aMe = (await call("/me", { token: again.json.accessToken })).json;
+    expect(aMe).toMatchObject({ email: aReg.email.toLowerCase(), role: "FARMER", avatarUrl: aAvatar });
+    expect(aMe.profile).toMatchObject({ fullName: "Alice Phiri", province: "SOUTHERN", district: "Choma" });
+    const aDash = (await call("/dashboard", { token: again.json.accessToken })).json;
+    expect(aDash).toMatchObject({ greetingName: "Alice", avatarUrl: aAvatar, location: { province: "SOUTHERN", district: "Choma" } });
+    const convs = (await call("/ai/conversations", { token: again.json.accessToken })).json;
+    expect(Array.isArray(convs) ? convs.length : convs.conversations?.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("each of the six account types gets its own profile and dashboard", async () => {
+    const roles = ["FARMER", "SUPPLIER", "BUYER", "EXPERT", "DISTRIBUTOR", "TRANSPORTER"];
+    const people = await Promise.all(
+      roles.map(async (role, i) => {
+        const r = person(role, `Test${role.charAt(0)}${role.slice(1).toLowerCase()} User${i}`, "SOUTHERN", "Choma");
+        const res = await call("/auth/register", { body: r });
+        expect(res.status).toBe(201);
+        return { role, reg: r, token: res.json.accessToken as string };
+      }),
+    );
+    for (const p of people) {
+      const me = (await call("/me", { token: p.token })).json;
+      expect(me).toMatchObject({ role: p.role, email: p.reg.email.toLowerCase() });
+      expect(me.profile.fullName).toBe(p.reg.fullName);
+      const dash = await call("/dashboard", { token: p.token });
+      expect(dash.status).toBe(200);
+      expect(dash.json).toMatchObject({ role: p.role, greetingName: p.reg.fullName.split(" ")[0] });
+      for (const other of people.filter((o) => o !== p)) expect(JSON.stringify(dash.json)).not.toContain(other.reg.fullName);
+    }
+  });
+});
