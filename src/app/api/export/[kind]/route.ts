@@ -38,7 +38,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ kind: string }
     ].join("\n");
     name = "agriflow-orders";
   } else if (kind === "inventory") {
-    if (user.role !== "FARMER" && user.role !== "SUPPLIER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (user.role !== "FARMER" && user.role !== "SUPPLIER" && user.role !== "DISTRIBUTOR") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const items = await prisma.inventoryItem.findMany({ where: { ownerId: user.id }, orderBy: { name: "asc" } });
     csv = [
       "Item,Category,Quantity,Unit,Unit cost (ZMW),Value (ZMW),Minimum level,Storage,Expiry",

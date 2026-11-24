@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Lightweight pre-check only: unauthenticated visitors to protected areas are redirected to login.
  * Real authentication + role authorisation happens server-side in layouts, server actions and route handlers.
  */
-const PROTECTED = ["/farmer", "/buyer", "/supplier", "/transporter", "/admin", "/onboarding", "/messages", "/notifications", "/deliveries"];
+const PROTECTED = ["/farmer", "/buyer", "/supplier", "/transporter", "/expert", "/admin", "/onboarding", "/messages", "/notifications", "/deliveries"];
 
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;

@@ -7,7 +7,7 @@ import { listDeliveriesFor } from "@/server/logistics/service";
 export const metadata: Metadata = { title: "My deliveries" };
 
 export default async function TransporterDeliveriesPage() {
-  const user = await requirePageRole("TRANSPORTER");
+  const user = await requirePageRole("TRANSPORTER", "DISTRIBUTOR");
   const deliveries = await listDeliveriesFor({ id: user.id, role: user.role });
   return (
     <>

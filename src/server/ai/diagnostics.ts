@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
-import { env } from "@/lib/env";
-import { callGrok, GrokUnavailableError, redact, XAI_ENDPOINT } from "./xai";
+import { GrokUnavailableError, redact } from "./xai";
+import { activeProvider, callAI, providerInfo } from "./provider";
 
 /**
  * Grok configuration self-test for administrators.
@@ -43,9 +43,9 @@ function explain(e: unknown, model: string): ProbeResult {
 }
 
 async function probeText(): Promise<ProbeResult> {
-  const model = env.xaiModel;
+  const model = providerInfo().textModel;
   try {
-    const r = await callGrok({ model, input: [{ role: "user", content: "Reply with exactly the word OK." }], maxOutputTokens: 64, timeoutMs: 25_000, retries: 1 });
+    const r = await callAI({ model, input: [{ role: "user", content: "Reply with exactly the word OK." }], maxOutputTokens: 64, timeoutMs: 25_000, retries: 1 });
     return { ok: true, model: r.model, latencyMs: r.latencyMs, sample: r.text.slice(0, 40) };
   } catch (e) {
     return explain(e, model);
@@ -53,9 +53,9 @@ async function probeText(): Promise<ProbeResult> {
 }
 
 async function probeVision(): Promise<ProbeResult> {
-  const model = env.xaiVisionModel;
+  const model = providerInfo().visionModel;
   try {
-    const r = await callGrok({
+    const r = await callAI({
       model,
       input: [{ role: "user", content: [{ type: "input_image", image_url: PROBE_PNG, detail: "low" }, { type: "input_text", text: "Name the two main colours in this image in at most five words." }] }],
       maxOutputTokens: 64,
@@ -70,6 +70,13 @@ async function probeVision(): Promise<ProbeResult> {
 
 function adviceFor(p: ProbeResult): string[] {
   if (p.ok) return [];
+  if (activeProvider() === "openrouter") {
+    if (p.reason === "HTTP" && (p.httpStatus === 401 || p.httpStatus === 403)) return ["OpenRouter rejected the key. Create a new key at openrouter.ai/settings/keys, replace OPENROUTER_API_KEY in Vercel and redeploy."];
+    if (p.reason === "HTTP" && p.httpStatus === 402) return ["The OpenRouter account has no credit left. Add credit at openrouter.ai/settings/credits."];
+    if (p.reason === "HTTP" && (p.httpStatus === 404 || p.httpStatus === 400)) return [`Check the model name (${p.model}). Set OPENROUTER_MODEL / OPENROUTER_VISION_MODEL to a model listed at openrouter.ai/models.`];
+    if (p.reason === "HTTP" && p.httpStatus === 429) return ["OpenRouter rate limit reached. Try again shortly, or add credit to raise limits."];
+    return ["OpenRouter did not return a usable answer. Try again in a few minutes."];
+  }
   switch (p.reason) {
     case "NOT_CONFIGURED":
       return ["Add XAI_API_KEY in Vercel → Project → Settings → Environment Variables (Production), then redeploy."];
@@ -88,8 +95,9 @@ function adviceFor(p: ProbeResult): string[] {
 }
 
 export async function runGrokDiagnostics(opts: { vision?: boolean; userId: string }): Promise<DiagnosticsReport> {
-  const keyConfigured = Boolean(env.xaiApiKey);
-  const text = keyConfigured ? await probeText() : explain(new GrokUnavailableError("XAI_API_KEY is not configured", "NOT_CONFIGURED"), env.xaiModel);
+  const info = providerInfo();
+  const keyConfigured = info.keyConfigured;
+  const text = keyConfigured ? await probeText() : explain(new GrokUnavailableError("XAI_API_KEY is not configured", "NOT_CONFIGURED"), info.textModel);
   const vision = keyConfigured && opts.vision && text.ok ? await probeVision() : ({ skipped: true } as const);
 
   for (const [feature, p] of [["diagnostics.text", text], ["diagnostics.vision", vision]] as const) {
@@ -116,10 +124,10 @@ export async function runGrokDiagnostics(opts: { vision?: boolean; userId: strin
 
   return {
     checkedAt: new Date().toISOString(),
-    endpoint: XAI_ENDPOINT,
+    endpoint: info.endpoint,
     keyConfigured,
-    textModel: env.xaiModel,
-    visionModel: env.xaiVisionModel,
+    textModel: info.textModel,
+    visionModel: info.visionModel,
     text,
     vision,
     last24h: {

@@ -2,7 +2,7 @@
 
 **Grow Smarter. Trade Better. Harvest More.**
 
-AgriFlow AI Zambia is an AI-powered agricultural ecosystem for Zambian farmers and agribusinesses. In one Progressive Web App it combines farm management, Grok-powered agricultural intelligence, a produce marketplace with negotiation, an input-supply marketplace, logistics, inventory, farm finances, notifications and an administrator console.
+AgriFlow AI Zambia is an AI-powered agricultural ecosystem for Zambian farmers and agribusinesses. A Progressive Web App and a native Flutter Android app (`mobile_app/`, sharing one backend and one account) combine farm management, Grok-powered agricultural intelligence, a produce marketplace with negotiation, an input-supply marketplace, logistics, inventory, farm finances, notifications and an administrator console.
 
 Built for the Agriculture & Agribusiness hackathon challenge. Grok (xAI) is the AI engine.
 
@@ -21,6 +21,7 @@ Built for the Agriculture & Agribusiness hackathon challenge. Grok (xAI) is the 
 | **Inventory** | Movements history, low-stock alerts, valuation, expiry, no negative stock without an authorised adjustment |
 | **Finance** | Decimal-safe income, expenses, gross and net profit; breakdowns by crop, field, category and month; estimates kept separate from actuals; CSV and PDF export |
 | **Notifications & messaging** | In-app notifications with per-type preferences; SMS, WhatsApp and email queued honestly as `NOT_CONFIGURED` until a provider is connected; buyer–farmer messaging with order threads |
+| **Experts & distributors** | Agricultural experts (admin-verified) give second opinions on crop-health photo checks farmers choose to share, without seeing who the farmer is; distributors both sell inputs and run deliveries |
 | **Admin** | Live analytics (no hard-coded numbers), user verification and suspension, super-admin role management, listing and product moderation, content reports, crops, categories and regions, verified market prices, settings, outbound message log, audit logs |
 | **Offline-first PWA** | Installable app, service worker with offline shell, IndexedDB queue for activities, notes and tasks, idempotent sync with retry/backoff and conflict detection, clear per-item status, no private pages cached |
 
@@ -101,12 +102,16 @@ npm run build && npx playwright test                                            
 GitHub Actions runs on every push to `main` and `feat/**`:
 
 - **CI** (`.github/workflows/ci.yml`): typecheck, lint, Vitest (unit + integration on Postgres 16), migrate + seed, production build, Playwright. Summary + logs: [`ci-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/ci-latest).
-- **Android** (`.github/workflows/android.yml`): debug APK, release APK and AAB, then an Android 14 emulator smoke test. Files + screenshots: [`android-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/android-latest).
+- **Flutter app** (`.github/workflows/flutter.yml`): `flutter analyze`, unit + widget tests, debug APK, release APK and AAB, then emulator walk-throughs on a Pixel 6 (Android 14) and a small Nexus 4 (Android 11), including a real call to the live API. Files, screenshots and logs: [`flutter-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/flutter-latest).
+- **Android web wrapper (legacy)** (`.github/workflows/android.yml`): the earlier Capacitor build, superseded by the Flutter app. [`android-latest` release](https://github.com/dev-lusale/Agriflow-AI/releases/tag/android-latest).
 
 ## Documentation
 
 - [docs/DEMO.md](docs/DEMO.md): the 4-minute judging demo script
-- [docs/ANDROID.md](docs/ANDROID.md): Android app, downloads, emulator test and release signing
+- [docs/MOBILE_APP.md](docs/MOBILE_APP.md): the Flutter Android app: architecture, builds, optional services, offline behaviour
+- [docs/MOBILE_API.md](docs/MOBILE_API.md): the `/api/v1` mobile API (JWT + rotating refresh tokens)
+- [docs/TESTING_REPORT.md](docs/TESTING_REPORT.md): what was tested and the results
+- [docs/ANDROID.md](docs/ANDROID.md): release signing (shared by both Android builds) and the legacy web wrapper
 - [docs/API.md](docs/API.md): route handlers, server actions and data contracts
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): Vercel + Supabase deployment
 - [docs/SECURITY.md](docs/SECURITY.md): security and privacy design
@@ -115,6 +120,7 @@ GitHub Actions runs on every push to `main` and `feat/**`:
 ## Project structure
 
 ```
+mobile_app/        Flutter Android app (lib/core, lib/features/*, test/)
 prisma/            schema, migrations (incl. RLS hardening), seed
 src/app/           routes: (public) site, auth, onboarding, farmer|buyer|supplier|transporter|admin areas,
                    (shared) messages/notifications/deliveries, offline, api/*
@@ -132,5 +138,6 @@ tests/             unit, integration, e2e
 - SMS, WhatsApp and email delivery need a provider. Email works with `RESEND_API_KEY`; otherwise messages are logged as `NOT_CONFIGURED`.
 - Market prices in the demo are fictional. Real use requires administrators to enter verified observations.
 - District reference coordinates are approximate town locations, used only for area weather when a farm has no GPS, and labelled as such.
+- Social sign-in (Google, Apple, Facebook) and push notifications are not configured yet; the app says so instead of pretending.
 - AI output is advisory and can be wrong. Diagnoses are never presented as definitive.
 - The platform has not been certified or audited for compliance with Zambia's Data Protection Act, 2021. It is designed to be ready for that review.

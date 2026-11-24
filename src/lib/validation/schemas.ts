@@ -1,7 +1,7 @@
 /** Zod schemas shared by client forms and server actions. Server actions always re-validate. */
 import { z } from "zod";
 
-const PROVINCE = z.enum([
+export const PROVINCE = z.enum([
   "LUSAKA",
   "COPPERBELT",
   "SOUTHERN",
@@ -26,7 +26,7 @@ const nonNeg = (label: string) => z.coerce.number({ error: `${label} must be a n
 const optNonNeg = (label: string) => nonNeg(label).optional();
 const dateStr = (label: string) => z.coerce.date({ error: `${label} must be a valid date` });
 const optDate = (label: string) => dateStr(label).optional();
-const phone = z
+export const phone = z
   .string()
   .trim()
   .regex(/^\+?[0-9 ]{9,15}$/, "Enter a valid phone number, e.g. +260 97 1234567");
@@ -41,7 +41,7 @@ export const registerSchema = z.object({
   email: z.email("Enter a valid email address").trim().toLowerCase().max(160),
   phone: phone.optional(),
   password: z.string().min(8, "At least 8 characters").max(128).regex(/[A-Za-z]/, "Include a letter").regex(/[0-9]/, "Include a number"),
-  role: z.enum(["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER"], { error: "Choose an account type" }),
+  role: z.enum(["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER", "EXPERT", "DISTRIBUTOR"], { error: "Choose an account type" }),
   consent: checkbox.refine((v) => v === true, "You must agree to the privacy notice to create an account"),
 });
 export type RegisterInput = z.input<typeof registerSchema>;
@@ -92,6 +92,22 @@ export const transporterOnboardingSchema = onboardingBaseSchema.extend({
   pricingModel: z.enum(["PER_KM", "PER_TONNE", "PER_TRIP", "NEGOTIABLE"]).default("NEGOTIABLE"),
   baseRate: optNonNeg("Base rate"),
   serviceProvinces: z.array(PROVINCE).min(1, "Choose at least one service province"),
+});
+export const expertOnboardingSchema = onboardingBaseSchema.extend({
+  organisation: optText(120),
+  qualification: optText(160),
+  specialisations: z.array(z.string().max(60)).min(1, "Choose at least one specialisation").max(12),
+});
+export const distributorOnboardingSchema = onboardingBaseSchema.extend({
+  businessName: reqText("Business name", 120),
+  registrationNumber: optText(60),
+  description: optText(600),
+  categories: z.array(z.string().max(60)).max(12).default([]),
+  contactPhone: phone.optional(),
+  serviceProvinces: z.array(PROVINCE).min(1, "Choose at least one service province"),
+});
+export const expertReviewSchema = z.object({
+  note: z.string().trim().min(20, "Write at least a short explanation (20+ characters)").max(3000),
 });
 
 // ── Farms ──
@@ -394,4 +410,54 @@ export const aiChatSchema = z.object({
 
 export const reportRequestSchema = z.object({
   type: z.enum(["WEEKLY_SUMMARY", "MONTHLY_REPORT", "CROP_PERFORMANCE", "EXPENSE_REPORT", "HARVEST_REPORT", "PROFITABILITY"]),
+});
+
+// ── Mobile API (v1) ──
+const strongPassword = z
+  .string()
+  .min(8, "At least 8 characters")
+  .max(128)
+  .regex(/[A-Za-z]/, "Include a letter")
+  .regex(/[0-9]/, "Include a number");
+
+export const mobileRegisterSchema = z
+  .object({
+    fullName: reqText("Full name", 100),
+    email: z.email("Enter a valid email address").trim().toLowerCase().max(160),
+    phone: phone,
+    password: strongPassword,
+    confirmPassword: z.string(),
+    country: z.literal("ZM", { error: "AgriFlow AI currently serves Zambia only" }).default("ZM"),
+    province: PROVINCE,
+    district: reqText("District", 60),
+    role: z.enum(["FARMER", "BUYER", "SUPPLIER", "TRANSPORTER", "EXPERT", "DISTRIBUTOR"], { error: "Choose an account type" }),
+    acceptTerms: z.literal(true, { error: "You must accept the terms and privacy notice" }),
+    deviceName: z.string().max(80).optional(),
+  })
+  .refine((v) => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "Passwords do not match" });
+
+export const mobileLoginSchema = z.object({
+  email: z.email("Enter a valid email address").trim().toLowerCase(),
+  password: z.string().min(1, "Password is required").max(128),
+  deviceName: z.string().max(80).optional(),
+});
+
+export const mobileResetSchema = z
+  .object({
+    email: z.email("Enter a valid email address").trim().toLowerCase(),
+    code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code"),
+    password: strongPassword,
+    confirmPassword: z.string(),
+  })
+  .refine((v) => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "Passwords do not match" });
+
+export const changePasswordSchema = z
+  .object({ currentPassword: z.string().min(1, "Enter your current password"), newPassword: strongPassword, confirmPassword: z.string() })
+  .refine((v) => v.newPassword === v.confirmPassword, { path: ["confirmPassword"], message: "Passwords do not match" });
+
+export const profileUpdateSchema = z.object({
+  fullName: reqText("Full name", 100).optional(),
+  phone: phone.optional(),
+  province: PROVINCE.optional(),
+  district: z.string().trim().max(60).optional(),
 });

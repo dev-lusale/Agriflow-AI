@@ -11,6 +11,7 @@ import { deliveryRequestSchema, deliveryUpdateSchema, vehicleSchema } from "@/li
 import { notify } from "@/server/notifications/service";
 import { canTransition, canTransitionDelivery, orderStatusForDelivery, type DeliveryParty } from "@/server/orders/machine";
 import { newOrderNumber, transitionOrder } from "@/server/orders/service";
+import { isCarrierRole } from "@/lib/auth/roles";
 
 const deliveryInclude = {
   order: { select: { id: true, orderNumber: true, status: true, buyerId: true, sellerId: true, type: true } },
@@ -25,13 +26,13 @@ function partyFor(actor: Actor, d: { requestedById: string; transporterId: strin
   if (d.requestedById === actor.id) return "REQUESTER";
   if (d.order && (d.order.buyerId === actor.id || d.order.sellerId === actor.id)) return "REQUESTER";
   if (actor.role === "ADMIN" || actor.role === "SUPER_ADMIN") return "ADMIN";
-  if (actor.role === "TRANSPORTER" && d.transporterId === null) return "TRANSPORTER"; // open request visible to transporters
+  if (isCarrierRole(actor.role) && d.transporterId === null) return "TRANSPORTER"; // open request visible to transporters
   throw forbidden("You do not have access to this delivery.");
 }
 
 /** Farmers or buyers request transport, optionally linked to one of their orders and/or a chosen transporter. */
 export async function requestDelivery(actor: Actor, input: z.input<typeof deliveryRequestSchema>) {
-  if (actor.role !== "FARMER" && actor.role !== "BUYER" && actor.role !== "SUPPLIER") throw forbidden("Only farmers, buyers and suppliers can request deliveries.");
+  if (actor.role !== "FARMER" && actor.role !== "BUYER" && actor.role !== "SUPPLIER" && actor.role !== "DISTRIBUTOR") throw forbidden("Only farmers, buyers and suppliers can request deliveries.");
   const d = deliveryRequestSchema.parse(input);
   if (!isValidDistrict(d.pickupProvince, d.pickupDistrict) || !isValidDistrict(d.dropoffProvince, d.dropoffDistrict)) throw invalid("Check the pickup and delivery districts.");
   if (d.orderId) {
@@ -43,7 +44,7 @@ export async function requestDelivery(actor: Actor, input: z.input<typeof delive
   }
   if (d.transporterId) {
     const t = await prisma.user.findUnique({ where: { id: d.transporterId }, include: { transporterProfile: true } });
-    if (!t || t.role !== "TRANSPORTER" || !t.transporterProfile) throw invalid("Choose a valid transporter.");
+    if (!t || !isCarrierRole(t.role) || !t.transporterProfile) throw invalid("Choose a valid transporter.");
   }
   const delivery = await prisma.$transaction(async (tx) => {
     const del = await tx.delivery.create({
@@ -82,7 +83,7 @@ export async function requestDelivery(actor: Actor, input: z.input<typeof delive
 
 export async function listDeliveriesFor(actor: Actor) {
   const where: Prisma.DeliveryWhereInput =
-    actor.role === "TRANSPORTER"
+    isCarrierRole(actor.role)
       ? { transporterId: actor.id }
       : { OR: [{ requestedById: actor.id }, { order: { buyerId: actor.id } }, { order: { sellerId: actor.id } }] };
   return prisma.delivery.findMany({ where, orderBy: { updatedAt: "desc" }, include: deliveryInclude, take: 200 });
@@ -90,7 +91,7 @@ export async function listDeliveriesFor(actor: Actor) {
 
 /** Open requests a transporter can take: unassigned in their service provinces, or directly assigned to them. */
 export async function openRequests(actor: Actor) {
-  if (actor.role !== "TRANSPORTER") throw forbidden();
+  if (!isCarrierRole(actor.role)) throw forbidden();
   const profile = await prisma.transporterProfile.findUnique({ where: { userId: actor.id } });
   return prisma.delivery.findMany({
     where: {
@@ -120,7 +121,7 @@ export async function updateDelivery(actor: Actor, input: z.input<typeof deliver
     }
     const data: Prisma.DeliveryUpdateInput = { status: d.status };
     if (d.status === "ACCEPTED") {
-      if (actor.role !== "TRANSPORTER") throw forbidden();
+      if (!isCarrierRole(actor.role)) throw forbidden();
       // claim atomically so two transporters cannot accept the same open request
       const claimed = await tx.delivery.updateMany({ where: { id: del.id, status: "REQUESTED", OR: [{ transporterId: null }, { transporterId: actor.id }] }, data: { transporterId: actor.id } });
       if (claimed.count === 0) throw new AppError("Another transporter already accepted this request.", "CONFLICT");
@@ -192,7 +193,7 @@ export async function listVehicles(actor: Actor) {
 }
 
 export async function addVehicle(actor: Actor, input: z.input<typeof vehicleSchema>) {
-  if (actor.role !== "TRANSPORTER") throw forbidden();
+  if (!isCarrierRole(actor.role)) throw forbidden();
   return prisma.vehicle.create({ data: { ...vehicleSchema.parse(input), ownerId: actor.id } });
 }
 
@@ -203,7 +204,7 @@ export async function setVehicleActive(actor: Actor, id: string, isActive: boole
 
 export async function listTransporters(province?: string) {
   return prisma.user.findMany({
-    where: { role: "TRANSPORTER", status: "ACTIVE", transporterProfile: { is: { isAvailable: true, ...(province ? { serviceProvinces: { has: province as never } } : {}) } } },
+    where: { role: { in: ["TRANSPORTER", "DISTRIBUTOR"] }, status: "ACTIVE", transporterProfile: { is: { isAvailable: true, ...(province ? { serviceProvinces: { has: province as never } } : {}) } } },
     select: { id: true, verifiedAt: true, transporterProfile: true, vehicles: { where: { isActive: true } }, _count: { select: { deliveriesAssigned: { where: { status: "DELIVERED" } } } } },
   });
 }

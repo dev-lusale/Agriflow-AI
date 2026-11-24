@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { env, isAIConfigured } from "@/lib/env";
+import { providerInfo } from "@/server/ai/provider";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,8 @@ export async function GET() {
       status: database === "ok" ? "ok" : "degraded",
       database,
       ai: isAIConfigured() ? "configured" : "not_configured",
-      aiModel: env.xaiModel,
+      aiProvider: providerInfo().provider,
+      aiModel: providerInfo().textModel,
       weatherProvider: env.weatherProvider,
       storage: env.supabaseUrl && env.supabaseServiceKey ? "supabase" : "database",
       email: env.resendApiKey ? "resend" : "not_configured",

@@ -20,6 +20,10 @@ enum Role {
   TRANSPORTER
   ADMIN
   SUPER_ADMIN
+  /// Agronomist / extension officer: reviews crop-health cases farmers send for a second opinion
+  EXPERT
+  /// Sells inputs (like a supplier) and runs deliveries (like a transporter)
+  DISTRIBUTOR
 }
 
 enum UserStatus {
@@ -44,6 +48,16 @@ enum TokenType {
   EMAIL_VERIFY
   PASSWORD_RESET
   PHONE_OTP
+  /// 6-digit code e-mailed for verification in the mobile app
+  EMAIL_OTP
+  /// 6-digit code e-mailed for password reset in the mobile app
+  RESET_OTP
+}
+
+enum ExpertReviewStatus {
+  NONE
+  REQUESTED
+  ANSWERED
 }
 
 enum AreaUnit {
@@ -387,13 +401,17 @@ model User {
   buyerProfile           BuyerProfile?
   supplierProfile        SupplierProfile?
   transporterProfile     TransporterProfile?
+  expertProfile          ExpertProfile?
   sessions               Session[]
+  refreshTokens          RefreshToken[]
+  pushDevices            PushDevice[]
+  expertReviews          CropHealthAssessment[]   @relation("ExpertReviewer")
   tokens                 VerificationToken[]
   farms                  Farm[]
   farmActivities         FarmActivity[]
   farmTasks              FarmTask[]
   farmNotes              FarmNote[]
-  assessments            CropHealthAssessment[]
+  assessments            CropHealthAssessment[]   @relation("AssessmentOwner")
   listings               ProduceListing[]
   supplierProducts       SupplierProduct[]
   inventoryItems         InventoryItem[]
@@ -476,6 +494,17 @@ model SupplierProfile {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model ExpertProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  organisation    String?
+  qualification   String?
+  specialisations String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model TransporterProfile {
   id               String       @id @default(cuid())
   userId           String       @unique
@@ -517,6 +546,37 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+/// Mobile app refresh tokens (rotated on every use; reuse of an old token revokes the whole family)
+model RefreshToken {
+  id           String    @id @default(cuid())
+  userId       String
+  tokenHash    String    @unique
+  familyId     String
+  deviceName   String?
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  lastUsedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+/// Firebase Cloud Messaging device tokens for push notifications
+model PushDevice {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  platform  String   @default("android")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -734,15 +794,23 @@ model CropHealthAssessment {
   expertRecommended Boolean          @default(false)
   model             String?
   isDemo            Boolean          @default(false)
+  /// Optional second opinion from a verified agricultural expert (farmer opts in)
+  expertReviewStatus ExpertReviewStatus @default(NONE)
+  reviewRequestedAt DateTime?
+  reviewerId        String?
+  expertNote        String?
+  expertReviewedAt  DateTime?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User             @relation("AssessmentOwner", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer          User?            @relation("ExpertReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
   farm              Farm?            @relation(fields: [farmId], references: [id], onDelete: SetNull)
   cropRecord        CropRecord?      @relation(fields: [cropRecordId], references: [id], onDelete: SetNull)
   crop              Crop             @relation(fields: [cropId], references: [id], onDelete: Restrict)
   image             Upload?          @relation(fields: [imageId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
+  @@index([expertReviewStatus, reviewRequestedAt])
 }
 
 // ───────────────────────────── Weather ─────────────────────────────

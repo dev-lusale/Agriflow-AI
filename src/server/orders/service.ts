@@ -40,7 +40,7 @@ export type OrderDetail = Prisma.PurchaseOrderGetPayload<{ include: typeof order
 export async function getOrder(actor: Actor, id: string) {
   const order = await prisma.purchaseOrder.findUnique({ where: { id }, include: orderInclude });
   if (!order) throw notFound("Order not found.");
-  const isTransporter = actor.role === "TRANSPORTER" && (await prisma.delivery.count({ where: { orderId: id, transporterId: actor.id } })) > 0;
+  const isTransporter = (actor.role === "TRANSPORTER" || actor.role === "DISTRIBUTOR") && (await prisma.delivery.count({ where: { orderId: id, transporterId: actor.id } })) > 0;
   if (!isTransporter) partyFor(actor, order); // throws if unauthorized
   return order;
 }

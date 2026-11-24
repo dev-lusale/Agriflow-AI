@@ -27,6 +27,16 @@ export const env = {
   get xaiVisionModel() {
     return read("XAI_VISION_MODEL") ?? read("XAI_MODEL") ?? "grok-4.7";
   },
+  /** OpenRouter (optional). When the key is set, AI requests go through OpenRouter instead of xAI. */
+  get openrouterApiKey() {
+    return read("OPENROUTER_API_KEY");
+  },
+  get openrouterModel() {
+    return read("OPENROUTER_MODEL") ?? "google/gemini-2.5-flash";
+  },
+  get openrouterVisionModel() {
+    return read("OPENROUTER_VISION_MODEL") ?? read("OPENROUTER_MODEL") ?? "google/gemini-2.5-flash";
+  },
   get aiHourlyLimit() {
     return Number(read("AI_HOURLY_LIMIT") ?? 30);
   },
@@ -59,4 +69,4 @@ export const env = {
   },
 };
 
-export const isAIConfigured = () => Boolean(env.xaiApiKey);
+export const isAIConfigured = () => Boolean(env.openrouterApiKey || env.xaiApiKey);

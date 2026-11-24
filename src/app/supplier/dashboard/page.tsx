@@ -16,7 +16,7 @@ import { listInventory } from "@/server/inventory/service";
 export const metadata: Metadata = { title: "Supplier dashboard" };
 
 export default async function SupplierDashboard() {
-  const user = await requirePageRole("SUPPLIER");
+  const user = await requirePageRole("SUPPLIER", "DISTRIBUTOR");
   const actor = { id: user.id, role: user.role };
   const [sales, orders, inv, products, profile] = await Promise.all([
     supplierSales(actor),

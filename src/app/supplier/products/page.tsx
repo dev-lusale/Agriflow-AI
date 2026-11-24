@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Products" };
 
 export default async function SupplierProductsPage({ searchParams }: { searchParams: Promise<{ new?: string }> }) {
   const sp = await searchParams;
-  const user = await requirePageRole("SUPPLIER");
+  const user = await requirePageRole("SUPPLIER", "DISTRIBUTOR");
   const [products, categories] = await Promise.all([listMyProducts({ id: user.id, role: user.role }), prisma.productCategory.findMany({ where: { isActive: true, kind: "INPUT" }, orderBy: { name: "asc" }, select: { id: true, name: true, requiresSafetyInfo: true } })]);
   return (
     <>

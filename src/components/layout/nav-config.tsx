@@ -117,6 +117,36 @@ export const NAV: Record<Role, NavGroup[]> = {
   ],
   ADMIN: adminNav(),
   SUPER_ADMIN: adminNav(),
+  EXPERT: [
+    {
+      items: [
+        { href: "/expert/dashboard", label: "Review cases", icon: HeartPulse },
+        { href: "/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
+      ],
+    },
+  ],
+  DISTRIBUTOR: [
+    {
+      title: "Selling",
+      items: [
+        { href: "/supplier/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/supplier/products", label: "Products", icon: Package },
+        { href: "/supplier/inventory", label: "Inventory", icon: Boxes },
+        { href: "/supplier/orders", label: "Orders", icon: ClipboardList },
+        { href: "/supplier/reports", label: "Sales reports", icon: BarChart3 },
+      ],
+    },
+    {
+      title: "Deliveries",
+      items: [
+        { href: "/transporter/requests", label: "Delivery requests", icon: ClipboardList },
+        { href: "/transporter/deliveries", label: "My deliveries", icon: Truck },
+        { href: "/transporter/vehicles", label: "Vehicles", icon: Tractor },
+        { href: "/messages", label: "Messages", icon: MessageSquare, badge: "messages" },
+        { href: "/notifications", label: "Notifications", icon: Bell, badge: "notifications" },
+      ],
+    },
+  ],
 };
 
 function adminNav(): NavGroup[] {
@@ -130,6 +160,8 @@ function adminNav(): NavGroup[] {
         { href: "/admin/buyers", label: "Buyers", icon: ShoppingCart },
         { href: "/admin/suppliers", label: "Suppliers", icon: Package },
         { href: "/admin/transporters", label: "Transporters", icon: Truck },
+        { href: "/admin/distributors", label: "Distributors", icon: Warehouse },
+        { href: "/admin/experts", label: "Experts", icon: HeartPulse },
       ],
     },
     {
@@ -206,5 +238,16 @@ export const MOBILE_TABS: Record<Role, NavItem[]> = {
     { href: "/admin/orders", label: "Orders", icon: ClipboardList },
     { href: "/admin/ai", label: "AI", icon: Brain },
     { href: "/admin/settings", label: "Settings", icon: ShieldCheck },
+  ],
+  EXPERT: [
+    { href: "/expert/dashboard", label: "Cases", icon: HeartPulse },
+    { href: "/notifications", label: "Alerts", icon: Bell },
+  ],
+  DISTRIBUTOR: [
+    { href: "/supplier/dashboard", label: "Home", icon: LayoutDashboard },
+    { href: "/supplier/products", label: "Products", icon: Package },
+    { href: "/transporter/requests", label: "Requests", icon: ClipboardList },
+    { href: "/transporter/deliveries", label: "Deliveries", icon: Truck },
+    { href: "/supplier/orders", label: "Orders", icon: ShoppingCart },
   ],
 };

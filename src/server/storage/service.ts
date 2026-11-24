@@ -44,7 +44,12 @@ export async function readUpload(actor: Actor | null, id: string) {
   if (!up) throw notFound();
   if (!up.isPublic) {
     if (!actor) throw new AppError("Sign in required.", "UNAUTHENTICATED");
-    const allowed = up.ownerId === actor.id || actor.role === "ADMIN" || actor.role === "SUPER_ADMIN" || (await isProofVisibleTo(actor.id, up.id));
+    const allowed =
+      up.ownerId === actor.id ||
+      actor.role === "ADMIN" ||
+      actor.role === "SUPER_ADMIN" ||
+      (await isProofVisibleTo(actor.id, up.id)) ||
+      (actor.role === "EXPERT" && (await isCaseImageVisibleToExpert(actor.id, up.id)));
     if (!allowed) throw forbidden();
   }
   return { upload: up, bytes: await uploadBytes(up) };
@@ -66,4 +71,18 @@ async function isProofVisibleTo(userId: string, uploadId: string) {
     select: { id: true },
   });
   return Boolean(d);
+}
+
+/**
+ * Crop-health photos are visible to verified experts only for cases the farmer sent for review
+ * (open cases, or cases this expert answered).
+ */
+async function isCaseImageVisibleToExpert(expertId: string, uploadId: string) {
+  const expert = await prisma.user.findUnique({ where: { id: expertId }, select: { verifiedAt: true, status: true } });
+  if (!expert?.verifiedAt || expert.status !== "ACTIVE") return false;
+  const a = await prisma.cropHealthAssessment.findFirst({
+    where: { imageId: uploadId, OR: [{ expertReviewStatus: "REQUESTED" }, { reviewerId: expertId }] },
+    select: { id: true },
+  });
+  return Boolean(a);
 }

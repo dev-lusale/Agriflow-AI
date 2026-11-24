@@ -45,9 +45,18 @@ jobs:
           node-version: 22
           cache: npm
       - name: Create test database
-        run: PGPASSWORD=agriflow psql -h localhost -p 5544 -U postgres -c "CREATE DATABASE agriflow_test;"
+        run: |
+          PGPASSWORD=agriflow psql -h localhost -p 5544 -U postgres -c "CREATE DATABASE agriflow_test;"
+          PGPASSWORD=agriflow psql -h localhost -p 5544 -U postgres -c "CREATE DATABASE agriflow_shadow;"
       - name: Install
         run: mkdir -p ci-logs && npm ci 2>&1 | tee ci-logs/01-install.log
+      - id: drift
+        name: Migrations match schema (no drift)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma \
+            --shadow-database-url postgresql://postgres:agriflow@localhost:5544/agriflow_shadow --exit-code 2>&1 | tee ci-logs/02a-migration-drift.log
       - id: typecheck
         name: Typecheck
         continue-on-error: true
@@ -87,6 +96,7 @@ jobs:
             echo
             echo "| Check | Result |"
             echo "|---|---|"
+            echo "| Migrations match schema | ${{ steps.drift.outcome }} |"
             echo "| Typecheck | ${{ steps.typecheck.outcome }} |"
             echo "| Lint | ${{ steps.lint.outcome }} |"
             echo "| Vitest (unit + integration) | ${{ steps.unit.outcome }} |"
@@ -113,6 +123,6 @@ jobs:
       - name: Fail if any check failed
         if: always()
         run: |
-          for o in "${{ steps.typecheck.outcome }}" "${{ steps.lint.outcome }}" "${{ steps.unit.outcome }}" "${{ steps.migrate.outcome }}" "${{ steps.build.outcome }}" "${{ steps.e2e.outcome }}"; do
+          for o in "${{ steps.drift.outcome }}" "${{ steps.typecheck.outcome }}" "${{ steps.lint.outcome }}" "${{ steps.unit.outcome }}" "${{ steps.migrate.outcome }}" "${{ steps.build.outcome }}" "${{ steps.e2e.outcome }}"; do
             [ "$o" = "failure" ] && exit 1
           done; exit 0

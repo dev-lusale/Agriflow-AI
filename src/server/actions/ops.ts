@@ -15,21 +15,21 @@ import type { NotificationType } from "@prisma/client";
 // ───────── inventory ─────────
 export async function createInventoryItemAction(fd: FormData) {
   return runAction(async () => {
-    await inventory.createInventoryItem(await requireRole("FARMER", "SUPPLIER"), parseInput(inventoryItemSchema, fd));
+    await inventory.createInventoryItem(await requireRole("FARMER", "SUPPLIER", "DISTRIBUTOR"), parseInput(inventoryItemSchema, fd));
     revalidatePath("/", "layout");
   }, "Item added.");
 }
 
 export async function moveStockAction(fd: FormData) {
   return runAction(async () => {
-    await inventory.moveStock(await requireRole("FARMER", "SUPPLIER"), parseInput(stockMovementSchema, fd));
+    await inventory.moveStock(await requireRole("FARMER", "SUPPLIER", "DISTRIBUTOR"), parseInput(stockMovementSchema, fd));
     revalidatePath("/", "layout");
   }, "Stock updated.");
 }
 
 export async function deleteInventoryItemAction(id: string) {
   return runAction(async () => {
-    await inventory.deleteInventoryItem(await requireRole("FARMER", "SUPPLIER"), id);
+    await inventory.deleteInventoryItem(await requireRole("FARMER", "SUPPLIER", "DISTRIBUTOR"), id);
     revalidatePath("/", "layout");
   }, "Item deleted.");
 }
@@ -37,7 +37,7 @@ export async function deleteInventoryItemAction(id: string) {
 // ───────── supplier products ─────────
 export async function createProductAction(fd: FormData) {
   return runAction(async () => {
-    const actor = await requireRole("SUPPLIER");
+    const actor = await requireRole("SUPPLIER", "DISTRIBUTOR");
     const img = fd.get("image");
     const imageId = img instanceof File && img.size > 0 ? (await saveImage(actor, img, "PRODUCT_PHOTO")).id : undefined;
     await suppliers.createProduct(actor, parseInput(supplierProductSchema, fd), imageId);
@@ -47,7 +47,7 @@ export async function createProductAction(fd: FormData) {
 
 export async function updateProductAction(id: string, fd: FormData) {
   return runAction(async () => {
-    await suppliers.updateProduct(await requireRole("SUPPLIER"), id, parseInput(supplierProductSchema, fd));
+    await suppliers.updateProduct(await requireRole("SUPPLIER", "DISTRIBUTOR"), id, parseInput(supplierProductSchema, fd));
     revalidatePath("/supplier", "layout");
   }, "Product updated.");
 }
@@ -55,7 +55,7 @@ export async function updateProductAction(id: string, fd: FormData) {
 // ───────── logistics ─────────
 export async function requestDeliveryAction(fd: FormData) {
   return runAction(async () => {
-    const d = await logistics.requestDelivery(await requireRole("FARMER", "BUYER", "SUPPLIER"), parseInput(deliveryRequestSchema, fd));
+    const d = await logistics.requestDelivery(await requireRole("FARMER", "BUYER", "SUPPLIER", "DISTRIBUTOR"), parseInput(deliveryRequestSchema, fd));
     revalidatePath("/", "layout");
     return { id: d.id };
   }, "Delivery requested. Transporters in the area have been notified.");
@@ -73,21 +73,21 @@ export async function updateDeliveryAction(fd: FormData) {
 
 export async function declineDeliveryAction(id: string, reason?: string) {
   return runAction(async () => {
-    await logistics.declineDelivery(await requireRole("TRANSPORTER"), id, reason);
+    await logistics.declineDelivery(await requireRole("TRANSPORTER", "DISTRIBUTOR"), id, reason);
     revalidatePath("/transporter", "layout");
   }, "Request declined.");
 }
 
 export async function addVehicleAction(fd: FormData) {
   return runAction(async () => {
-    await logistics.addVehicle(await requireRole("TRANSPORTER"), parseInput(vehicleSchema, fd));
+    await logistics.addVehicle(await requireRole("TRANSPORTER", "DISTRIBUTOR"), parseInput(vehicleSchema, fd));
     revalidatePath("/transporter/vehicles");
   }, "Vehicle added.");
 }
 
 export async function setVehicleActiveAction(id: string, active: boolean) {
   return runAction(async () => {
-    await logistics.setVehicleActive(await requireRole("TRANSPORTER"), id, active);
+    await logistics.setVehicleActive(await requireRole("TRANSPORTER", "DISTRIBUTOR"), id, active);
     revalidatePath("/transporter/vehicles");
   }, active ? "Vehicle activated." : "Vehicle deactivated.");
 }

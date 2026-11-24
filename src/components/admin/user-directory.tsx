@@ -86,7 +86,11 @@ export async function UserDirectory({ viewer, role, title, description, searchPa
                       ? `${u._count.supplierProducts} products · ${u._count.ordersAsSeller} orders`
                       : u.role === "TRANSPORTER"
                         ? `${u._count.deliveriesAssigned} deliveries`
-                        : "—";
+                        : u.role === "DISTRIBUTOR"
+                          ? `${u._count.supplierProducts} products · ${u._count.deliveriesAssigned} deliveries`
+                          : u.role === "EXPERT"
+                            ? (u.verifiedAt ? "Verified — can review cases" : "Not verified — cannot see cases yet")
+                            : "—";
               return (
                 <TR key={u.id}>
                   <TD>

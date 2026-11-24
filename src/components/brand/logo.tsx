@@ -2,13 +2,13 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /**
- * Official AgriFlow AI brand assets (generated from assets/brand/agriflow-logo-source.png
- * by scripts/generate-icons.mjs):
- *  - /brand/agriflow-mark.png  — the "A" emblem (leaf + fields)
+ * Official AgriFlow AI brand assets, generated from the vector logo assets/brand/agriflow-mark.svg
+ * (traced from the owner's "G + leaves" artwork, assets/brand/agriflow-logo-source.png):
+ *  - /brand/agriflow-mark.png  — the "G + leaves" emblem
  *  - /brand/agriflow-logo.png  — full lockup (emblem + AgriFlow AI wordmark)
  */
-const MARK = { src: "/brand/agriflow-mark.png", w: 819, h: 512 };
-const LOCKUP = { src: "/brand/agriflow-logo.png", w: 1500, h: 783 };
+const MARK = { src: "/brand/agriflow-mark.png", w: 761, h: 512 };
+const LOCKUP = { src: "/brand/agriflow-logo.png", w: 2555, h: 560 };
 
 /** The emblem, contained inside whatever box the className defines (default 36 px). */
 export function LogoMark({ className, title, priority }: { className?: string; title?: string; priority?: boolean }) {

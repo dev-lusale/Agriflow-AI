@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Logistics" };
 export default async function LogisticsPage() {
   const transporters = await prisma.user
     .findMany({
-      where: { role: "TRANSPORTER", status: "ACTIVE", transporterProfile: { isNot: null } },
+      where: { role: { in: ["TRANSPORTER", "DISTRIBUTOR"] }, status: "ACTIVE", transporterProfile: { isNot: null } },
       select: { id: true, verifiedAt: true, isDemo: true, transporterProfile: true, vehicles: { where: { isActive: true }, select: { capacityKg: true } } },
       take: 6,
     })

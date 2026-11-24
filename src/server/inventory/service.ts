@@ -10,7 +10,7 @@ import { notify } from "@/server/notifications/service";
 import { applyMovement } from "./calc";
 
 function assertInventoryRole(actor: Actor) {
-  if (actor.role !== "FARMER" && actor.role !== "SUPPLIER") throw forbidden("Inventory is available to farmers and suppliers.");
+  if (actor.role !== "FARMER" && actor.role !== "SUPPLIER" && actor.role !== "DISTRIBUTOR") throw forbidden("Inventory is available to farmers, suppliers and distributors.");
 }
 
 export async function listInventory(actor: Actor) {
